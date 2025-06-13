@@ -5,6 +5,8 @@ https://qiita.com/YurimyMiyu/items/d4fe132fc9bc8189eff4
 .envファイルを作成し、環境変数を追加
 
 
+てきとうにフォルダを作る
+
 ## コマンド
 ```
 git clone https://github.com/Nishigaki-Tsubasa/FoodApp.git

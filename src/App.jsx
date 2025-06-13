@@ -1,57 +1,69 @@
-import { useState } from 'react'
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase/firebase';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { doc, getDocFromServer } from 'firebase/firestore';
+import { db } from './firebase/firebase';
+
 import Login from './pages/Login';
 import Register from './pages/Register';
-import { signOut } from "firebase/auth";
-
+import ProfileForm from './pages/ProfileForm';
+import Home from './pages/Home';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [isLoginPage, setIsLoginPage] = useState(true);
+  const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      console.log('ログイン状態:', currentUser);
     });
     return () => unsubscribe();
   }, []);
-  const handleLogout = async () => {
-    try {
-      await signOut(auth); // FirebaseのsignOutでログアウト
-      console.log('ログアウト成功');
-    } catch (err) {
-      console.error('ログアウト失敗：', err.message);
+
+  // location.pathnameも依存配列に入れて、ページ遷移時に最新のuserDataを取得
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user) {
+        try {
+          const docRef = doc(db, 'users', user.uid);
+          const docSnap = await getDocFromServer(docRef); // サーバーから最新データを取得
+          if (docSnap.exists()) {
+            setUserData(docSnap.data());
+          } else {
+            setUserData(null);
+          }
+        } catch (error) {
+          console.error('ユーザーデータ取得エラー:', error);
+          setUserData(null);
+        }
+      } else {
+        setUserData(null);
+      }
+    };
+    fetchUserData();
+  }, [user, location.pathname]);
+
+  useEffect(() => {
+    if (user && userData) {
+      if (userData.firstcreated) {
+        navigate('/profile');
+      } else {
+        navigate('/home');
+      }
     }
-  };
-
-  if (user) {
-    return (
-      <div className="container d-flex justify-content-center align-items-center bg-light" style={{ minHeight: '100vh' }}>
-        <div className="card shadow-sm border-0 p-4 rounded-4" style={{ width: '100%', maxWidth: '400px' }}>
-          <h2 className="text-center mb-4 fw-bold text-success">ようこそ、{user.email}さん！</h2>
-          <p className="text-center">ログイン状態です。</p>
-
-          <button className="btn btn-outline-danger" onClick={handleLogout}>
-            ログアウト
-
-          </button>
-        </div>
-      </div>
-    );
-  }
+  }, [user, userData]); // navigateは依存配列から除外してもOK
 
   return (
-    <div>
-      {isLoginPage ? (
-        <Login setIsLoginPage={setIsLoginPage} />
-      ) : (
-        <Register setIsLoginPage={setIsLoginPage} />
-      )}
-    </div>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/profile" element={<ProfileForm />} />
+      <Route path="/home" element={<Home />} />
+    </Routes>
   );
 }
 
-export default App
+export default App;

@@ -6,8 +6,8 @@ https://qiita.com/YurimyMiyu/items/d4fe132fc9bc8189eff4
 
 
 ```
-git clone
-cd
+git clone https://github.com/Nishigaki-Tsubasa/FoodApp.git
+cd　meal-matching-react
 npm i
 npm run dev
 ```

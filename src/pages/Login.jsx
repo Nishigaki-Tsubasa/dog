@@ -1,23 +1,29 @@
 import { useState } from 'react';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '../firebase/firebase';
+import { auth, db } from '../firebase/firebase';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
-function Login({ setIsLoginPage }) {
+function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
-        setSuccess('');
-
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-            setSuccess('ログイン成功しました！');
+            const result = await signInWithEmailAndPassword(auth, email, password);
+            const userRef = doc(db, 'users', result.user.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists() && userSnap.data().firstcreated) {
+                navigate('/profile');
+            } else {
+                navigate('/home');
+            }
         } catch (err) {
-            setError("ログインに失敗しました。メールアドレスまたはパスワードを確認してください。");
+            setError('ログイン失敗: メールアドレスまたはパスワードが間違っています。');
         }
     };
 
@@ -25,73 +31,92 @@ function Login({ setIsLoginPage }) {
         const provider = new GoogleAuthProvider();
         try {
             const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            console.log("ログイン成功:", user);
-        } catch (error) {
-            console.error("Google ログイン失敗:", error);
+            const userRef = doc(db, 'users', result.user.uid);
+            const snap = await getDoc(userRef);
+
+            if (!snap.exists()) {
+                await setDoc(userRef, {
+                    uid: result.user.uid,
+                    email: result.user.email,
+                    displayName: result.user.displayName || '',
+                    createdAt: serverTimestamp(),
+                    firstcreated: true,
+                });
+                navigate('/profile');
+            } else if (snap.data().firstcreated) {
+                navigate('/profile');
+            } else {
+                navigate('/home');
+            }
+        } catch (err) {
+            console.error('Googleログイン失敗:', err);
         }
     };
 
     return (
         <div className="container d-flex justify-content-center align-items-center bg-light" style={{ minHeight: '100vh' }}>
-            <div className="card shadow-sm border-0 p-4 rounded-4" style={{ width: '100%', maxWidth: '400px' }}>
+            <div className="card p-4 shadow rounded-4 w-100" style={{ maxWidth: '400px' }}>
                 <h2 className="text-center mb-4 fw-bold text-success">ログイン</h2>
 
                 {error && <div className="alert alert-danger">{error}</div>}
-                {success && <div className="alert alert-success">{success}</div>}
 
                 <form onSubmit={handleLogin}>
                     <div className="mb-3">
-                        <label className="form-label">メールアドレス</label>
+                        <label htmlFor="email" className="form-label">メールアドレス</label>
                         <input
                             type="email"
+                            id="email"
                             className="form-control form-control-lg rounded-pill"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={e => setEmail(e.target.value)}
                             required
                         />
                     </div>
 
-                    <div className="mb-3">
-                        <label className="form-label">パスワード</label>
+                    <div className="mb-4">
+                        <label htmlFor="password" className="form-label">パスワード</label>
                         <input
                             type="password"
+                            id="password"
                             className="form-control form-control-lg rounded-pill"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={e => setPassword(e.target.value)}
                             required
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-success btn-lg mt-4 w-100 rounded-pill shadow-sm">
-                        ログイン
-                    </button>
+                    <div className="d-grid">
+                        <button type="submit" className="btn btn-success btn-lg rounded-pill shadow-sm">
+                            ログイン
+                        </button>
+                    </div>
+                </form>
 
+                <div className="d-grid mt-3">
                     <button
                         type="button"
-                        className="btn btn-outline-primary btn w-100 mt-3 rounded d-flex align-items-center justify-content-center shadow-sm"
+                        className="btn btn-outline-primary btn-lg rounded-pill shadow-sm d-flex align-items-center justify-content-center gap-2"
                         onClick={handleGoogleLogin}
                     >
                         <img
                             src="https://developers.google.com/identity/images/g-logo.png"
                             alt="Googleロゴ"
-                            style={{ width: 20, marginRight: 8 }}
+                            style={{ width: 20, height: 20 }}
                         />
-                        Googleでログイン
+                        <span>Googleでログイン</span>
                     </button>
-                </form>
-
-                <div className="text-center mt-4">
-                    <small>
+                </div>
+                <div className="d-grid mt-3">
+                    <small className="text-center">
                         アカウントをお持ちでない方は{' '}
                         <span
                             role="button"
                             tabIndex={0}
-                            onClick={() => setIsLoginPage(false)}
+                            onClick={() => navigate('/register')}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                     e.preventDefault();
-                                    setIsLoginPage(false);
+                                    setIsLoginPage(true);
                                 }
                             }}
                             style={{
@@ -104,6 +129,8 @@ function Login({ setIsLoginPage }) {
                         </span>
                     </small>
                 </div>
+
+
             </div>
         </div>
     );

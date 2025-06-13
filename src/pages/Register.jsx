@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
-
+import { useNavigate } from 'react-router-dom';
 
 function Register({ setIsLoginPage }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [name, setName] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -26,18 +27,17 @@ function Register({ setIsLoginPage }) {
             const uid = userCredential.user.uid;
 
             await setDoc(doc(db, 'users', uid), {
-                name,
                 email,
                 createdAt: serverTimestamp(),
                 role: 'user',
+                firstcreated: true,
             });
 
             setSuccess('登録に成功しました！');
             setEmail('');
             setPassword('');
-            setName('');
         } catch (err) {
-            setError(err.message);
+            setError('登録に失敗しました: ' + err.message);
         }
     };
 
@@ -50,17 +50,6 @@ function Register({ setIsLoginPage }) {
                 {success && <div className="alert alert-success">{success}</div>}
 
                 <form onSubmit={handleRegister}>
-                    <div className="mb-3">
-                        <label className="form-label">名前</label>
-                        <input
-                            type="text"
-                            className="form-control form-control-lg rounded-pill"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                        />
-                    </div>
-
                     <div className="mb-3">
                         <label className="form-label">メールアドレス</label>
                         <input
@@ -94,7 +83,7 @@ function Register({ setIsLoginPage }) {
                         <span
                             role="button"
                             tabIndex={0}
-                            onClick={() => setIsLoginPage(true)}
+                            onClick={() => navigate('/')}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                     e.preventDefault();

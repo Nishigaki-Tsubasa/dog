@@ -15,6 +15,8 @@ function App() {
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [hasRedirected, setHasRedirected] = useState(false);
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -47,21 +49,29 @@ function App() {
   }, [user, location.pathname]);
 
   useEffect(() => {
-    if (user && userData) {
-      if (userData.firstcreated) {
+    if (!user || userData === null || hasRedirected) return;
+
+    if (userData.firstcreated) {
+      if (location.pathname !== '/profile') {
+        setHasRedirected(true);
         navigate('/profile');
-      } else {
+      }
+    } else {
+      if (!location.pathname.startsWith('/home')) {
+        setHasRedirected(true);
         navigate('/home');
       }
     }
-  }, [user, userData]); // navigateは依存配列から除外してもOK
+  }, [user, userData, location.pathname, hasRedirected]);
+
+
 
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/profile" element={<ProfileForm />} />
-      <Route path="/home" element={<Home />} />
+      <Route path="/home/*" element={<Home />} />
     </Routes>
   );
 }

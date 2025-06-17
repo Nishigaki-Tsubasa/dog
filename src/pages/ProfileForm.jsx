@@ -38,21 +38,104 @@ function ProfileForm() {
     };
 
     return (
-        <div className="container">
-            <h2>プロフィール登録</h2>
-            <form onSubmit={handleSubmit}>
-                <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="名前" required />
-                <input type="number" name="age" value={formData.age} onChange={handleChange} placeholder="年齢" required />
-                <select name="gender" value={formData.gender} onChange={handleChange}>
-                    <option value="man">男性</option>
-                    <option value="woman">女性</option>
-                    <option value="other">その他</option>
-                </select>
-                <input type="text" name="favoriteFoods" value={formData.favoriteFoods} onChange={handleChange} placeholder="好きな料理 (カンマ区切り)" />
-                <input type="text" name="dislikedFoods" value={formData.dislikedFoods} onChange={handleChange} placeholder="苦手な料理 (カンマ区切り)" />
-                <textarea name="intro" value={formData.intro} onChange={handleChange} placeholder="自己紹介" />
-                <button type="submit">保存する</button>
-            </form>
+        <div
+            className="container d-flex justify-content-center align-items-center bg-light"
+            style={{ minHeight: '100vh' }}
+        >
+            <div
+                className="card shadow-sm border-0 p-4 rounded-4"
+                style={{ width: '100%', maxWidth: '700px' }}
+            >
+                <h2 className="text-center mb-4 fw-bold text-primary">プロフィール登録</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                        <label htmlFor="username" className="form-label small">名前</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            className="form-control form-control-sm rounded-pill"
+                            placeholder="名前"
+                            required
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <label htmlFor="age" className="form-label small">年齢</label>
+                        <input
+                            type="number"
+                            id="age"
+                            name="age"
+                            value={formData.age}
+                            onChange={handleChange}
+                            className="form-control form-control-sm rounded-pill"
+                            placeholder="年齢"
+                            required
+                            min={0}
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <label htmlFor="gender" className="form-label small">性別</label>
+                        <select
+                            id="gender"
+                            name="gender"
+                            value={formData.gender}
+                            onChange={handleChange}
+                            className="form-select form-select-sm rounded-pill"
+                        >
+                            <option value="man">男性</option>
+                            <option value="woman">女性</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+
+                    <div className="mb-3">
+                        <label htmlFor="favoriteFoods" className="form-label small">好きな料理 (カンマ区切り)</label>
+                        <input
+                            type="text"
+                            id="favoriteFoods"
+                            name="favoriteFoods"
+                            value={formData.favoriteFoods}
+                            onChange={handleChange}
+                            className="form-control form-control-sm rounded-pill"
+                            placeholder="例：寿司, カレー, ピザ"
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <label htmlFor="dislikedFoods" className="form-label small">苦手な料理 (カンマ区切り)</label>
+                        <input
+                            type="text"
+                            id="dislikedFoods"
+                            name="dislikedFoods"
+                            value={formData.dislikedFoods}
+                            onChange={handleChange}
+                            className="form-control form-control-sm rounded-pill"
+                            placeholder="例：納豆, パクチー"
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="intro" className="form-label small">自己紹介</label>
+                        <textarea
+                            id="intro"
+                            name="intro"
+                            value={formData.intro}
+                            onChange={handleChange}
+                            className="form-control form-control-sm rounded-4"
+                            rows={2}
+                            placeholder="自己紹介を書いてください"
+                        />
+                    </div>
+
+                    <button type="submit" className="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">
+                        保存する
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

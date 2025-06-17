@@ -10,14 +10,25 @@ import Register from './pages/Register';
 import ProfileForm from './pages/ProfileForm';
 import Home from './pages/Home';
 
+// ローディングコンポーネント
+function Loading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="text-center text-gray-500 text-lg animate-pulse">読み込み中...</div>
+    </div>
+  );
+}
+
 function App() {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(true);
   const [hasRedirected, setHasRedirected] = useState(false);
 
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  // 認証状態の監視
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -25,13 +36,13 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  // location.pathnameも依存配列に入れて、ページ遷移時に最新のuserDataを取得
+  // ユーザーデータ取得
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
         try {
           const docRef = doc(db, 'users', user.uid);
-          const docSnap = await getDocFromServer(docRef); // サーバーから最新データを取得
+          const docSnap = await getDocFromServer(docRef);
           if (docSnap.exists()) {
             setUserData(docSnap.data());
           } else {
@@ -44,10 +55,12 @@ function App() {
       } else {
         setUserData(null);
       }
+      setIsLoading(false); // 認証 or データ取得完了後にローディング解除
     };
     fetchUserData();
   }, [user, location.pathname]);
 
+  // リダイレクト処理
   useEffect(() => {
     if (!user || userData === null || hasRedirected) return;
 
@@ -64,7 +77,8 @@ function App() {
     }
   }, [user, userData, location.pathname, hasRedirected]);
 
-
+  // ローディング中なら表示
+  if (isLoading) return <Loading />;
 
   return (
     <Routes>

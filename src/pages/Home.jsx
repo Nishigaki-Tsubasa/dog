@@ -2,8 +2,10 @@ import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/firebase';
 
-import MealLogForm from '../components/MealLogForm';
 import EditProfile from '../components/EditProfile';
+import MealRegistrationForm from '../components/MealRegistrationForm';
+import MealList from '../components/MealList';
+
 
 const Placeholder = ({ title }) => (
     <div className="fs-4 text-secondary">{title}画面 - 準備中...</div>
@@ -64,8 +66,8 @@ function Home() {
                 <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4">
                     <Routes>
                         <Route path="*" element={<Placeholder title="ホーム" />} />
-                        <Route path="new-request" element={<MealLogForm />} />
-                        <Route path="matchings" element={<Placeholder title="マッチング一覧" />} />
+                        <Route path="new-request" element={<MealRegistrationForm />} />
+                        <Route path="matchings" element={<MealList />} />
                         <Route path="chat" element={<Placeholder title="チャット" />} />
                         <Route path="share" element={<Placeholder title="食事予定" />} />
                         <Route path="feedback" element={<Placeholder title="フィードバック" />} />

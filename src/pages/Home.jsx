@@ -7,6 +7,10 @@ import { doc, getDoc } from 'firebase/firestore';
 import EditProfile from '../components/EditProfile';
 import MealRegistrationForm from '../components/MealRegistrationForm';
 import MealList from '../components/MealList';
+import MatchingsRequests from '../components/MatchingsRequests';
+import Matching from '../components/MyMatchedParticipations';
+import MatchingDetail from '../components/MatchingDetail';
+import HomeComponents from '../components/HomeComponents';
 
 const Placeholder = ({ title }) => (
     <div className="fs-4 text-secondary">{title}画面 - 準備中...</div>
@@ -78,16 +82,31 @@ function Home() {
                         <li className="nav-item">
                             <Link className="nav-link" to="/home/">ホーム</Link>
                         </li>
-                        <li className="nav-item">
+
+
+                        {/* <li className="nav-item">
                             <Link className="nav-link" to="/home/new-request">食事の登録</Link>
+                        </li> */}
+
+
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/home/mealList">参加申し込み</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/home/matchings">食事一覧</Link>
+                            <Link className="nav-link" to="/home/matchingsRequests">登録した食事リクエスト</Link>
                         </li>
+
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/home/matching">マッチングした食事</Link>
+                        </li>
+
+
                         <li className="nav-item">
                             <Link className="nav-link" to="/home/chat">チャット</Link>
                         </li>
-                        <li className="nav-item">
+
+
+                        {/* <li className="nav-item">
                             <Link className="nav-link" to="/home/share">食事予定</Link>
                         </li>
                         <li className="nav-item">
@@ -95,7 +114,9 @@ function Home() {
                         </li>
                         <li className="nav-item">
                             <Link className="nav-link" to="/home/history">履歴・健康データ</Link>
-                        </li>
+                        </li> */}
+
+
                         <li className="nav-item">
                             <Link className="nav-link" to="/home/EditProfile">プロフィール編集</Link>
                         </li>
@@ -110,9 +131,14 @@ function Home() {
                 {/* メイン表示部分 */}
                 <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4">
                     <Routes>
-                        <Route path="*" element={<Placeholder title="ホーム" />} />
+                        <Route path="*" element={<HomeComponents />} />
                         <Route path="new-request" element={<MealRegistrationForm />} />
-                        <Route path="matchings" element={<MealList />} />
+                        <Route path="mealList" element={<MealList />} />
+                        <Route path="matchingsRequests" element={<MatchingsRequests />} />
+                        <Route path="matching" element={<Matching />} />
+
+                        <Route path="matching/:requestId" element={<MatchingDetail />} />
+
                         <Route path="chat" element={<Placeholder title="チャット" />} />
                         <Route path="share" element={<Placeholder title="食事予定" />} />
                         <Route path="feedback" element={<Placeholder title="フィードバック" />} />

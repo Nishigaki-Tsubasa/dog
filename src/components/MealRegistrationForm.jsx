@@ -1,135 +1,142 @@
 import React, { useState } from 'react';
-import { Plus, Calendar, MapPin, Users, MessageSquare } from 'lucide-react';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebase';
 
-function MealRegistrationForm() {
-    const [formData, setFormData] = useState({
-        datetime: '',
-        location: '',
-        people: 1,
-        comment: '',
+const generateJitsiURL = () => {
+    const randomString = Math.random().toString(36).substring(2, 10);
+    return `https://meet.jit.si/mealmatch-${randomString}`;
+};
+
+const MealRequestForm = () => {
+    const [form, setForm] = useState({
+        date: '',
+        time: '',
+        durationMinutes: 30,
+        genre: '',
+        menu: '',
+        participantsLimit: '',
     });
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // Jitsiのルーム名をランダム生成してURLを作成する関数
-    const generateRoomUrl = () => {
-        const roomName = "room-" + Math.random().toString(36).substring(2, 10);
-        return `https://meet.jit.si/${roomName}`;
+    const handleChange = e => {
+        setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: name === 'people' ? parseInt(value) || 1 : value,
-        }));
-    };
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = async e => {
         e.preventDefault();
-        setIsSubmitting(true);
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) return alert('ログインが必要です');
+
+        const [year, month, day] = form.date.split('-');
+        const [hour, minute] = form.time.split(':');
+        const startTime = new Date(year, month - 1, day, hour, minute);
+
+        const durationHours = Number(form.durationMinutes) / 60;
+        const participantsLimit = form.participantsLimit ? Number(form.participantsLimit) : null;
+        const jitsiURL = generateJitsiURL();
 
         try {
-            const url = generateRoomUrl();  // ここでURL生成
-
-            await addDoc(collection(db, 'meals'), {
-                ...formData,
-                url,  // 生成したURLを保存
-                datetime: Timestamp.fromDate(new Date(formData.datetime)),
+            await addDoc(collection(db, 'mealRequests'), {
+                uid: user.uid,
+                username: user.username || '匿名',
+                startTime: Timestamp.fromDate(startTime),
+                durationHours,
+                format: 'online',
+                location: jitsiURL,
+                genre: form.genre,
+                menu: form.menu,
+                participantsLimit,
                 createdAt: Timestamp.now(),
+                participants: [],
+                pendingRequests: []
             });
-            alert(`食事が登録されました！\nビデオ通話URL:\n${url}`);
-            setFormData({ datetime: '', location: '', people: 1, comment: '' });
+
+            setForm({
+                date: '',
+                time: '',
+                durationMinutes: 30,
+                genre: '',
+                menu: '',
+                participantsLimit: '',
+            });
+
+            alert('食事リクエストを投稿しました！');
+            window.location.href = '/home/matchingsRequests';
         } catch (error) {
-            console.error('保存失敗:', error);
-            alert('保存に失敗しました');
-        } finally {
-            setIsSubmitting(false);
+            alert('投稿に失敗しました。もう一度お試しください。');
+            console.error(error);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="card p-4 shadow-sm border rounded-3">
-            <div className="mb-4">
-                <h2 className="h4 mb-1">食事を登録</h2>
-                <p className="text-muted">一緒に食事を楽しむ仲間を見つけませんか？</p>
-            </div>
+        <div className="container mt-4">
+            <h2 className="mb-4">オンライン食事リクエスト投稿　</h2>
 
-            <div className="mb-3">
-                <label className="form-label d-flex align-items-center gap-2">
-                    <Calendar size={16} />
-                    日時
-                </label>
-                <input
-                    type="datetime-local"
-                    name="datetime"
-                    value={formData.datetime}
-                    onChange={handleChange}
-                    required
-                    className="form-control"
-                />
-            </div>
+            <form className="card p-4 shadow" onSubmit={handleSubmit}>
+                <div className="mb-3">
+                    <label className="form-label">日付</label>
+                    <input type="date" className="form-control" name="date" onChange={handleChange} required />
+                </div>
 
-            <div className="mb-3">
-                <label className="form-label d-flex align-items-center gap-2">
-                    <MapPin size={16} />
-                    場所
-                </label>
-                <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    required
-                    placeholder="例：新宿駅周辺のカフェ"
-                    className="form-control"
-                />
-            </div>
+                <div className="mb-3">
+                    <label className="form-label">開始時間</label>
+                    <input type="time" className="form-control" name="time" onChange={handleChange} required />
+                </div>
 
-            <div className="mb-3">
-                <label className="form-label d-flex align-items-center gap-2">
-                    <Users size={16} />
-                    募集人数
-                </label>
-                <input
-                    type="number"
-                    name="people"
-                    value={formData.people}
-                    onChange={handleChange}
-                    min="1"
-                    max="20"
-                    required
-                    className="form-control"
-                />
-            </div>
+                <div className="mb-3">
+                    <label className="form-label">所要時間（分単位）</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        name="durationMinutes"
+                        min="10"
+                        step="10"
+                        value={form.durationMinutes}
+                        onChange={handleChange}
+                        required
+                    />
+                    <small className="form-text text-muted">※ 例：30分、60分、90分など</small>
+                </div>
 
-            <div className="mb-4">
-                <label className="form-label d-flex align-items-center gap-2">
-                    <MessageSquare size={16} />
-                    コメント（任意）
-                </label>
-                <textarea
-                    name="comment"
-                    value={formData.comment}
-                    onChange={handleChange}
-                    rows="3"
-                    className="form-control"
-                    placeholder="食事の種類、雰囲気、その他お伝えしたいことがあればどうぞ..."
-                />
-            </div>
+                <div className="mb-3">
+                    <label className="form-label">ジャンル（例：和食、洋食など）</label>
+                    <select className="form-control" name="genre" onChange={handleChange} required>
+                        <option value="">選択してください</option>
+                        <option value="和食">和食</option>
+                        <option value="洋食">洋食</option>
+                        <option value="中華">中華</option>
+                        <option value="韓国料理">韓国料理</option>
+                        <option value="イタリアン">イタリアン</option>
+                        <option value="フレンチ">フレンチ</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
 
-            <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`btn w-100 d-flex justify-content-center align-items-center gap-2 ${isSubmitting ? 'btn-secondary disabled' : 'btn-warning'}`}
-            >
-                <Plus size={18} />
-                {isSubmitting ? '登録中...' : '食事を登録する'}
-            </button>
-        </form>
+                <div className="mb-3">
+                    <label className="form-label">食べるもの　任意</label>
+                    <input type="text" className="form-control" name="menu" onChange={handleChange} />
+                </div>
+
+                <div className="mb-3">
+                    <label className="form-label">参加人数上限</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        name="participantsLimit"
+                        min="1"
+                        step="1"
+                        value={form.participantsLimit}
+                        onChange={handleChange}
+                        placeholder="例）3"
+                    />
+                    <small className="form-text text-muted">※ 空欄なら制限なし</small>
+                </div>
+
+                <button type="submit" className="btn btn-primary w-100">リクエストを投稿</button>
+            </form>
+        </div>
     );
-}
+};
 
-export default MealRegistrationForm;
+export default MealRequestForm;

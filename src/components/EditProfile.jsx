@@ -13,6 +13,9 @@ const EditProfile = () => {
         intro: '',
     });
 
+    const [loading, setLoading] = useState(true);
+    const [saveMessage, setSaveMessage] = useState('');  // 通知メッセージ用state
+
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -20,6 +23,7 @@ const EditProfile = () => {
                 const user = auth.currentUser;
                 if (!user) {
                     console.error('ログインユーザーが見つかりません');
+                    setLoading(false);
                     return;
                 }
                 const docRef = doc(db, 'users', user.uid);
@@ -31,6 +35,8 @@ const EditProfile = () => {
                 }
             } catch (error) {
                 console.error('データ取得エラー:', error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchProfile();
@@ -50,17 +56,45 @@ const EditProfile = () => {
                 return;
             }
             await setDoc(doc(db, 'users', user.uid), formData);
-            alert('プロフィールが更新されました');
+            setSaveMessage('プロフィールが更新されました');
+            // 3秒後に通知を非表示にする
+            setTimeout(() => {
+                setSaveMessage('');
+            }, 3000);
         } catch (error) {
             console.error('保存エラー:', error);
+            setSaveMessage('保存に失敗しました');
+            setTimeout(() => {
+                setSaveMessage('');
+            }, 3000);
         }
     };
 
+    if (loading) {
+        return (
+            <div className="container mt-5">
+                <div className="text-center">読み込み中...</div>
+            </div>
+        );
+    }
+
     return (
-        <div className="container mt-5">
-            <div className="card p-4 shadow">
+        <div
+            className="d-flex justify-content-center align-items-center bg-light"
+
+        >
+            <div className="card shadow p-4 w-100" style={{ maxWidth: '800px' }}>
                 <h2 className="card-title mb-4">プロフィール編集</h2>
+
+                {/* 通知表示 */}
+                {saveMessage && (
+                    <div className="alert alert-info" role="alert">
+                        {saveMessage}
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit}>
+                    {/* ここは元のフォーム */}
                     <div className="mb-3">
                         <label className="form-label">ユーザー名</label>
                         <input

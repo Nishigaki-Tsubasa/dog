@@ -5,7 +5,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDocFromServer } from 'firebase/firestore';
 import { db } from './firebase/firebase';
 
-import Login from './pages/Login';
+import Login from './pages/LoginForm.jsx';
 import Register from './pages/Register';
 import ProfileForm from './pages/ProfileForm';
 import Home from './pages/Home';

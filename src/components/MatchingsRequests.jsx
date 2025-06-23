@@ -121,7 +121,7 @@ const MyRequestsWithDetails = () => {
                 <h2 className="mb-0">登録した食事リクエスト詳細</h2>
                 <button
                     className="btn btn-primary"
-                    onClick={() => window.location.href = '/home/MealRegistrationForm'}
+                    onClick={() => window.location.href = '/home/new-request'}
                 >
                     食事の投稿
                 </button>

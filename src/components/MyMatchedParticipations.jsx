@@ -3,6 +3,7 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
+import { Rewind } from 'lucide-react';
 
 const MyMatchedParticipationsOnly = () => {
     const [participantList, setParticipantList] = useState([]);
@@ -31,7 +32,6 @@ const MyMatchedParticipationsOnly = () => {
                     const hostDoc = await getDoc(doc(db, 'users', data.uid));
                     hostName = hostDoc.exists() ? (hostDoc.data().username || '匿名') : '不明';
                 }
-
                 participantRequests.push({
                     id: docSnap.id,
                     ...data,
@@ -69,6 +69,30 @@ const MyMatchedParticipationsOnly = () => {
                                     {req.location}
                                 </a>
                             </p>
+
+                            <div className="d-flex gap-2 mb-3">
+                                <a
+                                    href={req.location}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn btn-outline-primary flex-grow-1"
+                                    style={{ textDecoration: 'none' }}
+                                >
+                                    通話
+                                </a>
+
+                                <button
+                                    className="btn btn-outline-primary flex-grow-1"
+                                    onClick={() => {
+                                        console.log(req.uid);
+                                        navigate(`/home/chatStart/${req.uid}`);
+                                    }}
+                                >
+                                    チャット
+                                </button>
+
+                            </div>
+
                             <button
                                 className="btn btn-outline-primary btn-sm"
                                 onClick={() => navigate(`/home/matching/${req.id}`)}
@@ -79,7 +103,7 @@ const MyMatchedParticipationsOnly = () => {
                     </div>
                 ))
             )}
-        </div>
+        </div >
     );
 };
 

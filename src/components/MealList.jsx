@@ -3,11 +3,13 @@ import { collection, getDocs, doc, updateDoc, arrayUnion } from 'firebase/firest
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebase';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
-const MealRequestList = () => {
+const MealList = () => {
     const [requests, setRequests] = useState([]);
     const auth = getAuth();
     const user = auth.currentUser;
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!user) return;
@@ -45,7 +47,6 @@ const MealRequestList = () => {
 
     const renderStatus = (request) => {
         if (!user) return 'ログインしてください';
-
         const userId = user.uid;
         if (request.participants?.includes(userId)) return '承認済み';
         if (request.pendingRequests?.includes(userId)) return '承認待ち';
@@ -55,69 +56,70 @@ const MealRequestList = () => {
     return (
         <div className="container mt-4">
             <h2 className="mb-4">食事リクエスト一覧</h2>
-            {requests.length === 0 && <p>リクエストがありません</p>}
-            <div className="list-group">
-                {requests
-                    .filter(req => req.uid !== user.uid) // 自分の投稿は除外
-                    .filter(req => req.startTime.toDate() > new Date()) // 過ぎた開始時間は除外
-                    .filter(req => !req.participants?.includes(user.uid)) // 承認済み除外する
-
-
-                    .map(req => (
-                        <div
-                            key={req.id}
-                            className="list-group-item list-group-item-action d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3"
-                        >
-                            {/* 以下は元の表示内容 */}
-                            <div>
-                                <p className="mb-1">
-                                    <strong>投稿者: </strong> {req.username}
-                                </p>
-                                <p className="mb-1">
-                                    <strong>日時: </strong>
-                                    {format(req.startTime.toDate(), 'M月d日(EEE) HH:mm')}〜（
-                                    {Math.round(req.durationHours * 60)}分）
-                                </p>
-                                <p className="mb-1">
-                                    <strong>ジャンル・メニュー: </strong>
-                                    {req.genre} / {req.menu}
-                                </p>
-                                <p className="mb-1">
-                                    <strong>オンラインURL: </strong>
-                                    {renderStatus(req) === '承認済み' ? (
-                                        <a href={req.location} target="_blank" rel="noopener noreferrer">
-                                            {req.location}
-                                        </a>
-                                    ) : (
-                                        '申請後に表示'
-                                    )}
-                                </p>
-                                <p className="mb-0">
-                                    <strong>状態: </strong>
-                                    {renderStatus(req)}
-                                </p>
+            {requests.length === 0 ? (
+                <p className="text-muted">リクエストがありません</p>
+            ) : (
+                <div className="row row-cols-1 row-cols-md-2 g-4">
+                    {requests
+                        .filter(req => req.uid !== user.uid)
+                        .filter(req => req.startTime.toDate() > new Date())
+                        .filter(req => !req.participants?.includes(user.uid))
+                        .map(req => (
+                            <div key={req.id} className="col">
+                                <div className="card h-100 shadow-sm">
+                                    <div className="card-body">
+                                        <h5 className="card-title">
+                                            <span
+                                                className="text-primary text-decoration-underline"
+                                                role="button"
+                                                onClick={() => navigate(`/home/profile/${req.uid}`)}
+                                            >
+                                                {req.username}
+                                            </span>
+                                        </h5>
+                                        <p className="card-text mb-1">
+                                            <strong>日時:</strong>{' '}
+                                            {format(req.startTime.toDate(), 'M月d日(EEE) HH:mm')}〜（
+                                            {Math.round(req.durationHours * 60)}分）
+                                        </p>
+                                        <p className="card-text mb-1">
+                                            <strong>ジャンル・メニュー:</strong> {req.genre} / {req.menu || '未設定'}
+                                        </p>
+                                        {/* <p className="card-text mb-1">
+                                            <strong>オンラインURL:</strong>{' '}
+                                            {renderStatus(req) === '承認済み' ? (
+                                                <a href={req.location} target="_blank" rel="noopener noreferrer">
+                                                    {req.location}
+                                                </a>
+                                            ) : (
+                                                <span className="text-muted">申請後に表示</span>
+                                            )}
+                                        </p> */}
+                                        {/* <p className="card-text">
+                                            <strong>状態:</strong> {renderStatus(req)}
+                                        </p> */}
+                                    </div>
+                                    <div className="card-footer bg-transparent border-top-0 text-end">
+                                        {renderStatus(req) === '申請可能' ? (
+                                            <button
+                                                className="btn btn-sm btn-primary"
+                                                onClick={() => handleApply(req)}
+                                            >
+                                                参加申請
+                                            </button>
+                                        ) : (
+                                            <button className="btn btn-sm btn-secondary" disabled>
+                                                {renderStatus(req)}
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                {renderStatus(req) === '申請可能' && (
-                                    <button
-                                        className="btn btn-primary"
-                                        onClick={() => handleApply(req)}
-                                    >
-                                        参加申請
-                                    </button>
-                                )}
-                                {(renderStatus(req) === '承認待ち' || renderStatus(req) === '承認済み') && (
-                                    <button className="btn btn-secondary" disabled>
-                                        {renderStatus(req)}
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-            </div>
+                        ))}
+                </div>
+            )}
         </div>
     );
-
 };
 
-export default MealRequestList;
+export default MealList;

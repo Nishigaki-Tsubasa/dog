@@ -11,6 +11,10 @@ import MatchingsRequests from '../components/MatchingsRequests';
 import Matching from '../components/MyMatchedParticipations';
 import MatchingDetail from '../components/MatchingDetail';
 import HomeComponents from '../components/HomeComponents';
+import UserProfilePage from '../components/UserProfilePage';
+import ChatList from '../components/chatComponets/ChatList';
+import ChatRoom from '../components/chatComponets/ChatRoom';
+import ChatStart from '../components/chatComponets/ChatStart';
 
 const Placeholder = ({ title }) => (
     <div className="fs-4 text-secondary">{title}画面 - 準備中...</div>
@@ -138,8 +142,13 @@ function Home() {
                         <Route path="matching" element={<Matching />} />
 
                         <Route path="matching/:requestId" element={<MatchingDetail />} />
+                        <Route path="profile/:uid" element={<UserProfilePage />} />
 
-                        <Route path="chat" element={<Placeholder title="チャット" />} />
+                        <Route path="chat" element={<ChatList />} />
+                        <Route path="/chat/:roomId" element={<ChatRoom />} />
+                        <Route path="/chatStart/:userId" element={<ChatStart />} />
+
+
                         <Route path="share" element={<Placeholder title="食事予定" />} />
                         <Route path="feedback" element={<Placeholder title="フィードバック" />} />
                         <Route path="history" element={<Placeholder title="履歴・健康データ" />} />

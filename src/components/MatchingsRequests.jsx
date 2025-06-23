@@ -13,11 +13,13 @@ import {
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebase';
+import { useNavigate } from 'react-router-dom';
 
 const MyRequestsWithDetails = () => {
     const [myRequests, setMyRequests] = useState([]);
     const auth = getAuth();
     const user = auth.currentUser;
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!user) return;
@@ -32,7 +34,6 @@ const MyRequestsWithDetails = () => {
                 const pendingUIDs = data.pendingRequests || [];
                 const participantsUIDs = data.participants || [];
 
-                // pendingUsers を取得
                 const pendingUsers = await Promise.all(
                     pendingUIDs.map(async (uid) => {
                         const userDoc = await getDoc(doc(db, 'users', uid));
@@ -43,7 +44,6 @@ const MyRequestsWithDetails = () => {
                     })
                 );
 
-                // participantUsers を取得
                 const participantUsers = await Promise.all(
                     participantsUIDs.map(async (uid) => {
                         const userDoc = await getDoc(doc(db, 'users', uid));
@@ -157,14 +157,25 @@ const MyRequestsWithDetails = () => {
                             <dt className="col-sm-3">申請ユーザー</dt>
                             <dd className="col-sm-9">
                                 {req.pendingUsers.length === 0 ? (
-                                    '申請ユーザーはいません。'
+                                    <p className="text-muted fst-italic">申請ユーザーはいません。</p>
                                 ) : (
                                     <ul className="list-unstyled mb-0">
                                         {req.pendingUsers.map((user) => (
-                                            <li key={user.uid} className="d-flex align-items-center mb-2">
-                                                <span className="flex-grow-1">{user.username}</span>
+                                            <li
+                                                key={user.uid}
+                                                className="d-flex align-items-center mb-2 gap-2"
+                                                style={{ flexWrap: 'wrap' }}
+                                            >
                                                 <button
-                                                    className="btn btn-success btn-sm me-2"
+                                                    onClick={() => navigate(`/home/profile/${user.uid}`)}
+                                                    className="btn btn-link p-0 text-decoration-underline flex-grow-1 text-start"
+                                                    style={{ minWidth: '120px' }}
+                                                >
+                                                    {user.username}
+                                                </button>
+
+                                                <button
+                                                    className="btn btn-success btn-sm"
                                                     onClick={() => handleApproval(req.id, user.uid, true)}
                                                 >
                                                     承認
@@ -181,6 +192,7 @@ const MyRequestsWithDetails = () => {
                                 )}
                             </dd>
 
+
                             <dt className="col-sm-3">参加済みユーザー</dt>
                             <dd className="col-sm-9">
                                 {req.participantUsers.length === 0 ? (
@@ -188,7 +200,14 @@ const MyRequestsWithDetails = () => {
                                 ) : (
                                     <ul className="list-unstyled mb-0">
                                         {req.participantUsers.map((user) => (
-                                            <li key={user.uid}>{user.username}</li>
+                                            <li key={user.uid}>
+                                                <button
+                                                    onClick={() => navigate(`/home/profile/${user.uid}`)}
+                                                    className="btn btn-link p-0 text-decoration-underline text-start"
+                                                >
+                                                    {user.username}
+                                                </button>
+                                            </li>
                                         ))}
                                     </ul>
                                 )}

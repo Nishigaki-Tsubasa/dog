@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebase';
 
@@ -28,6 +28,11 @@ const MealRequestForm = () => {
         const user = auth.currentUser;
         if (!user) return alert('ログインが必要です');
 
+        // Firestoreからユーザーのusernameを取得
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        const username = userDocSnap.exists() ? userDocSnap.data().username : '匿名';
+
         const [year, month, day] = form.date.split('-');
         const [hour, minute] = form.time.split(':');
         const startTime = new Date(year, month - 1, day, hour, minute);
@@ -39,7 +44,7 @@ const MealRequestForm = () => {
         try {
             await addDoc(collection(db, 'mealRequests'), {
                 uid: user.uid,
-                username: user.username || '匿名',
+                username,
                 startTime: Timestamp.fromDate(startTime),
                 durationHours,
                 format: 'online',
@@ -71,7 +76,7 @@ const MealRequestForm = () => {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4">オンライン食事リクエスト投稿　</h2>
+            <h2 className="mb-4">オンライン食事リクエスト投稿</h2>
 
             <form className="card p-4 shadow" onSubmit={handleSubmit}>
                 <div className="mb-3">

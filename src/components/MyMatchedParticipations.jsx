@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
 import { Rewind } from 'lucide-react';
 
+
 const MyMatchedParticipationsOnly = () => {
     const [participantList, setParticipantList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -89,6 +90,13 @@ const MyMatchedParticipationsOnly = () => {
                                     }}
                                 >
                                     チャット
+                                </button>
+
+                                <button
+                                    onClick={() => navigate(`/home/jitsi/${req.roomId}`)}>
+
+                                    ぼたん
+
                                 </button>
 
                             </div>

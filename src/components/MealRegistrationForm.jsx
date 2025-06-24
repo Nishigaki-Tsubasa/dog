@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { collection, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebase';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const generateJitsiURL = () => {
     const randomString = Math.random().toString(36).substring(2, 10);
     return `https://meet.jit.si/mealmatch-${randomString}`;
 };
+
+
 
 const MealRequestForm = () => {
     const [form, setForm] = useState({
@@ -40,6 +44,7 @@ const MealRequestForm = () => {
         const durationHours = Number(form.durationMinutes) / 60;
         const participantsLimit = form.participantsLimit ? Number(form.participantsLimit) : null;
         const jitsiURL = generateJitsiURL();
+        const roomId = uuidv4(); // ランダムなルームIDを生成
 
         try {
             await addDoc(collection(db, 'mealRequests'), {
@@ -54,7 +59,8 @@ const MealRequestForm = () => {
                 participantsLimit,
                 createdAt: Timestamp.now(),
                 participants: [],
-                pendingRequests: []
+                pendingRequests: [],
+                roomId: roomId,
             });
 
             setForm({

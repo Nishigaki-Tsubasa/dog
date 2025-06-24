@@ -64,10 +64,10 @@ const MyMatchedParticipationsOnly = () => {
                             <p className="card-text">
                                 <strong>投稿者:</strong> {req.hostName}<br />
                                 <strong>日時:</strong> {req.startTime.toDate().toLocaleString()}（{Math.round(req.durationHours * 60)}分）<br />
-                                <strong>通話URL:</strong>{' '}
+                                {/* <strong>通話URL:</strong>{' '}
                                 <a href={req.location} target="_blank" rel="noopener noreferrer">
                                     {req.location}
-                                </a>
+                                </a> */}
                             </p>
 
                             <div className="d-flex gap-2 mb-3">

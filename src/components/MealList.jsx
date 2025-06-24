@@ -55,7 +55,7 @@ const MealList = () => {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4">食事リクエスト一覧</h2>
+            <h2 className="mb-4">食事の一覧</h2>
             {requests.length === 0 ? (
                 <p className="text-muted">リクエストがありません</p>
             ) : (

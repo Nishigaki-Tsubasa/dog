@@ -1,56 +1,53 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db, auth } from '../../firebase/firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const ChatStart = () => {
-  const { userId } = useParams(); // チャット相手のユーザーID
+  const { userId } = useParams();
   const navigate = useNavigate();
   const currentUser = auth.currentUser;
-
-  console.log('StartChat component rendered with userId:', userId);
+  const hasRun = useRef(false); // 🔑 実行フラグ
 
   useEffect(() => {
+    if (hasRun.current) return; // すでに実行済みなら何もしない
+    hasRun.current = true;
+
     const createOrGetChatRoom = async () => {
       if (!currentUser) {
         alert('ログインしてください');
         navigate('/login');
         return;
       }
+
       if (!userId) {
-        alert('チャット相手が指定されていません', userId);
+        alert('チャット相手が指定されていません');
         return;
       }
 
-      const currentUserId = currentUser.uid;
-
-      if (userId === currentUserId) {
+      if (userId === currentUser.uid) {
         alert('自分自身とチャットはできません');
         return;
       }
 
-      // まず、自分が含まれるチャットルームを取得
       const q = query(
         collection(db, 'chatRooms'),
-        where('members', 'array-contains', currentUserId)
+        where('members', 'array-contains', currentUser.uid)
       );
       const snapshot = await getDocs(q);
 
-      // その中から相手も含まれるチャットルームを探す
       const existingRoomDoc = snapshot.docs.find(doc => {
         const members = doc.data().members;
         return members.includes(userId);
       });
 
       if (existingRoomDoc) {
-        // 既存のチャットルームがあれば遷移
         navigate(`/home/chat/${existingRoomDoc.id}`);
         return;
       }
 
-      // なければ新規作成
       const newRoomRef = await addDoc(collection(db, 'chatRooms'), {
-        members: [currentUserId, userId].sort(),
+        members: [currentUser.uid, userId].sort(),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         lastMessage: '',

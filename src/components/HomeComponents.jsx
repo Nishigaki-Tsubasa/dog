@@ -90,7 +90,14 @@ const HomeComponents = () => {
                                     </h6>
                                     <hr />
                                     <p className="card-text mb-2">
-                                        <strong>日時:</strong> {meal.startTime.toDate().toLocaleString()}<br />
+                                        <strong>日時:</strong> {meal.startTime.toDate().toLocaleString('ja-JP', {
+                                            year: 'numeric',
+                                            month: '2-digit',
+                                            day: '2-digit',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            second: undefined, // 秒を非表示に
+                                        })}<br />
                                         <strong>時間:</strong> {Math.round(meal.durationHours * 60)}分<br />
                                     </p>
                                     <div className="d-flex gap-2 mb-3">

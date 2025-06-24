@@ -114,7 +114,7 @@ const ChatRoom = () => {
         <div className="container-fluid vh-100 d-flex flex-column p-0 bg-light">
             {/* ヘッダー（戻るボタン付き） */}
             <div className="bg-white shadow-sm px-4 py-3 border-bottom d-flex align-items-center">
-                <button className="btn btn-outline-secondary me-3" onClick={() => navigate(-1)}>
+                <button className="btn btn-outline-secondary me-3" onClick={() => navigate('/home/chat')}>
                     ← 戻る
                 </button>
                 <h5 className="mb-0">チャット：{otherUserName || '相手ユーザー'}</h5>

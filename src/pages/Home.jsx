@@ -16,6 +16,7 @@ import ChatList from '../components/chatComponets/ChatList';
 import ChatRoom from '../components/chatComponets/ChatRoom';
 import ChatStart from '../components/chatComponets/ChatStart';
 import OffcanvasSidebar from '../components/OffcanvasSidebar';
+import JitsiMeet from '../components/JitsiMeet';
 
 const Placeholder = ({ title }) => (
     <div className="fs-4 text-secondary">{title}画面 - 準備中...</div>
@@ -130,6 +131,9 @@ function Home() {
 
                 {/* メイン表示エリア */}
                 <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4">
+
+                    {/* <JitsiMeet roomName="dev-meet-01" displayName="西垣" /> */}
+
                     <Routes>
                         <Route path="*" element={<HomeComponents />} />
                         <Route path="new-request" element={<MealRegistrationForm />} />
@@ -141,6 +145,7 @@ function Home() {
                         <Route path="chat" element={<ChatList />} />
                         <Route path="/chat/:roomId" element={<ChatRoom />} />
                         <Route path="/chatStart/:userId" element={<ChatStart />} />
+                        <Route path="/jitsi/:roomId" element={<JitsiMeet />} />
                         <Route path="share" element={<Placeholder title="食事予定" />} />
                         <Route path="feedback" element={<Placeholder title="フィードバック" />} />
                         <Route path="history" element={<Placeholder title="履歴・健康データ" />} />

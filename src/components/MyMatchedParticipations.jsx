@@ -3,8 +3,6 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
-import { Rewind } from 'lucide-react';
-
 
 const MyMatchedParticipationsOnly = () => {
     const [participantList, setParticipantList] = useState([]);
@@ -16,35 +14,56 @@ const MyMatchedParticipationsOnly = () => {
     useEffect(() => {
         if (!user) return;
 
-        const fetchParticipantRequests = async () => {
+        const fetchRequests = async () => {
             setLoading(true);
+            const allRequests = [];
 
-            // 自分が参加者として承認されたリクエストのみ取得
-            const q = query(collection(db, 'mealRequests'), where('participants', 'array-contains', user.uid));
-            const snapshot = await getDocs(q);
-            const participantRequests = [];
-
-            for (const docSnap of snapshot.docs) {
+            // ① 自分が参加者のリクエスト
+            const q1 = query(collection(db, 'mealRequests'), where('participants', 'array-contains', user.uid));
+            const snapshot1 = await getDocs(q1);
+            for (const docSnap of snapshot1.docs) {
                 const data = docSnap.data();
-
-                // ホスト名を取得
                 let hostName = '匿名';
                 if (data.uid) {
                     const hostDoc = await getDoc(doc(db, 'users', data.uid));
                     hostName = hostDoc.exists() ? (hostDoc.data().username || '匿名') : '不明';
                 }
-                participantRequests.push({
+                allRequests.push({
                     id: docSnap.id,
                     ...data,
                     hostName,
+                    isHost: false,
                 });
             }
 
-            setParticipantList(participantRequests);
+            // ② 自分がホストで、参加者が1人以上いるリクエスト
+            const q2 = query(collection(db, 'mealRequests'), where('uid', '==', user.uid));
+            const snapshot2 = await getDocs(q2);
+            for (const docSnap of snapshot2.docs) {
+                const data = docSnap.data();
+                if (data.participants && data.participants.length > 0) {
+                    allRequests.push({
+                        id: docSnap.id,
+                        ...data,
+                        hostName: user.username || '自分',
+                        isHost: true,
+                    });
+                }
+            }
+
+            // 重複排除（同じリクエストにホストと参加者両方で該当した場合）
+            const uniqueRequests = Object.values(
+                allRequests.reduce((acc, item) => {
+                    acc[item.id] = item;
+                    return acc;
+                }, {})
+            );
+
+            setParticipantList(uniqueRequests);
             setLoading(false);
         };
 
-        fetchParticipantRequests();
+        fetchRequests();
     }, [user]);
 
     if (!user) return <p className="text-center mt-4">ログインしてください</p>;
@@ -65,10 +84,6 @@ const MyMatchedParticipationsOnly = () => {
                             <p className="card-text">
                                 <strong>投稿者:</strong> {req.hostName}<br />
                                 <strong>日時:</strong> {req.startTime.toDate().toLocaleString()}（{Math.round(req.durationHours * 60)}分）<br />
-                                {/* <strong>通話URL:</strong>{' '}
-                                <a href={req.location} target="_blank" rel="noopener noreferrer">
-                                    {req.location}
-                                </a> */}
                             </p>
 
                             <div className="d-flex gap-2 mb-3">
@@ -79,26 +94,22 @@ const MyMatchedParticipationsOnly = () => {
                                     className="btn btn-outline-primary flex-grow-1"
                                     style={{ textDecoration: 'none' }}
                                 >
-                                    通話
+                                    URLを開く
                                 </a>
 
                                 <button
                                     className="btn btn-outline-primary flex-grow-1"
-                                    onClick={() => {
-                                        console.log(req.uid);
-                                        navigate(`/home/chatStart/${req.uid}`);
-                                    }}
+                                    onClick={() => navigate(`/home/chatStart/${req.uid}`)}
                                 >
                                     チャット
                                 </button>
 
                                 <button
-                                    onClick={() => navigate(`/home/jitsi/${req.roomId}`)}>
-
-                                    ぼたん
-
+                                    className="btn btn-outline-secondary flex-grow-1"
+                                    onClick={() => navigate(`/home/jitsi/${req.roomId}`)}
+                                >
+                                    ビデオ通話
                                 </button>
-
                             </div>
 
                             <button
@@ -111,7 +122,7 @@ const MyMatchedParticipationsOnly = () => {
                     </div>
                 ))
             )}
-        </div >
+        </div>
     );
 };
 

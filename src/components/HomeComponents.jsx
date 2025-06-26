@@ -100,7 +100,7 @@ const HomeComponents = () => {
                                         })}<br />
                                         <strong>時間:</strong> {Math.round(meal.durationHours * 60)}分<br />
                                     </p>
-                                    <div className="d-flex gap-2 mb-3">
+                                    {/* <div className="d-flex gap-2 mb-3">
                                         <div className="d-flex gap-2 mb-3">
                                             <a
                                                 href={meal.location}
@@ -119,7 +119,7 @@ const HomeComponents = () => {
                                             </button>
                                         </div>
 
-                                    </div>
+                                    </div> */}
 
                                 </div>
                             </div>

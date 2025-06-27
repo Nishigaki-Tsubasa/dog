@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { collection, doc, updateDoc, arrayUnion, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebase';
 import { format } from 'date-fns';
@@ -13,12 +13,13 @@ const MealList = () => {
 
     useEffect(() => {
         if (!user) return;
-        const fetchRequests = async () => {
-            const querySnapshot = await getDocs(collection(db, 'mealRequests'));
-            const list = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        const unsubscribe = onSnapshot(collection(db, 'mealRequests'), (snapshot) => {
+            const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setRequests(list);
-        };
-        fetchRequests();
+        });
+
+        return () => unsubscribe(); // クリーンアップ
     }, [user]);
 
     const handleApply = async (request) => {
@@ -35,14 +36,18 @@ const MealList = () => {
             pendingRequests: arrayUnion(userId),
         });
 
+        // 🔔 通知をホストに送信
+        await addDoc(collection(db, 'notifications'), {
+            to: request.uid,
+            from: userId,
+            requestId: request.id,
+            type: 'apply',
+            read: false,
+            timestamp: serverTimestamp(),
+            message: `${request.username || '匿名'}さんがあなたの食事リクエストに参加申請しました。`,
+        });
+
         alert('参加申請しました');
-        setRequests(prev =>
-            prev.map(r =>
-                r.id === request.id
-                    ? { ...r, pendingRequests: [...(r.pendingRequests || []), userId] }
-                    : r
-            )
-        );
     };
 
     const renderStatus = (request) => {
@@ -85,19 +90,6 @@ const MealList = () => {
                                         <p className="card-text mb-1">
                                             <strong>ジャンル・メニュー:</strong> {req.genre} / {req.menu || '未設定'}
                                         </p>
-                                        {/* <p className="card-text mb-1">
-                                            <strong>オンラインURL:</strong>{' '}
-                                            {renderStatus(req) === '承認済み' ? (
-                                                <a href={req.location} target="_blank" rel="noopener noreferrer">
-                                                    {req.location}
-                                                </a>
-                                            ) : (
-                                                <span className="text-muted">申請後に表示</span>
-                                            )}
-                                        </p> */}
-                                        {/* <p className="card-text">
-                                            <strong>状態:</strong> {renderStatus(req)}
-                                        </p> */}
                                     </div>
                                     <div className="card-footer bg-transparent border-top-0 text-end">
                                         {renderStatus(req) === '申請可能' ? (

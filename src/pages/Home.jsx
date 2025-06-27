@@ -17,6 +17,9 @@ import ChatRoom from '../components/chatComponets/ChatRoom';
 import ChatStart from '../components/chatComponets/ChatStart';
 import OffcanvasSidebar from '../components/OffcanvasSidebar';
 import JitsiMeet from '../components/JitsiMeet';
+import NotificationIcon from '../components/NotificationIcon';
+import Notifications from '../components/Notifications';
+
 
 const Placeholder = ({ title }) => (
     <div className="fs-4 text-secondary">{title}画面 - 準備中...</div>
@@ -82,7 +85,7 @@ function Home() {
 
                     <div className="mb-4 p-3 bg-light rounded shadow-sm d-flex align-items-center gap-3">
                         <i className="bi bi-person-circle fs-3 text-primary"></i>
-                        <div className="small">
+                        <div className="small flex-grow-1">
                             <div className="text-secondary">ようこそ、</div>
                             {loading ? (
                                 <div className="text-secondary">読み込み中...</div>
@@ -90,7 +93,14 @@ function Home() {
                                 <div className="fw-bold text-dark">{username ?? '名無し'}</div>
                             )}
                         </div>
+                        {/* <NotificationIcon
+                            onClick={() => {
+                                // 通知一覧ページに遷移
+                                navigate('/home/notifications');
+                            }}
+                        /> */}
                     </div>
+
 
 
                     <ul className="nav flex-column gap-2">
@@ -146,6 +156,8 @@ function Home() {
                         <Route path="/chat/:roomId" element={<ChatRoom />} />
                         <Route path="/chatStart/:userId" element={<ChatStart />} />
                         <Route path="/jitsi/:roomId" element={<JitsiMeet />} />
+                        <Route path="/notifications" element={<Notifications />} />
+
                         <Route path="share" element={<Placeholder title="食事予定" />} />
                         <Route path="feedback" element={<Placeholder title="フィードバック" />} />
                         <Route path="history" element={<Placeholder title="履歴・健康データ" />} />

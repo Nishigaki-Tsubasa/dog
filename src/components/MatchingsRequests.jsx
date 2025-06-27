@@ -144,7 +144,7 @@ const MyRequestsWithDetails = () => {
 
                             <dt className="col-sm-3">参加者上限</dt>
                             <dd className="col-sm-9">{req.participantsLimit ? `${req.participantsLimit}人` : 'なし'}</dd>
-
+                            {/* 
                             <dt className="col-sm-3">場所（ビデオ通話リンク）</dt>
                             <dd className="col-sm-9">
                                 {req.location ? (
@@ -152,7 +152,7 @@ const MyRequestsWithDetails = () => {
                                         リンクを開く
                                     </a>
                                 ) : '未設定'}
-                            </dd>
+                            </dd> */}
 
                             <dt className="col-sm-3">申請ユーザー</dt>
                             <dd className="col-sm-9">
@@ -191,7 +191,6 @@ const MyRequestsWithDetails = () => {
                                     </ul>
                                 )}
                             </dd>
-
 
                             <dt className="col-sm-3">参加済みユーザー</dt>
                             <dd className="col-sm-9">

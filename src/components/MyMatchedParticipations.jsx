@@ -87,7 +87,7 @@ const MyMatchedParticipationsOnly = () => {
                             </p>
 
                             <div className="d-flex gap-2 mb-3">
-                                <a
+                                {/* <a
                                     href={req.location}
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -95,7 +95,14 @@ const MyMatchedParticipationsOnly = () => {
                                     style={{ textDecoration: 'none' }}
                                 >
                                     URLを開く
-                                </a>
+                                </a> */}
+
+                                <button
+                                    className="btn btn-outline-primary flex-grow-1"
+                                    onClick={() => navigate(`/home/jitsi/${req.roomId}`)}
+                                >
+                                    ビデオ通話
+                                </button>
 
                                 <button
                                     className="btn btn-outline-primary flex-grow-1"
@@ -104,12 +111,7 @@ const MyMatchedParticipationsOnly = () => {
                                     チャット
                                 </button>
 
-                                <button
-                                    className="btn btn-outline-secondary flex-grow-1"
-                                    onClick={() => navigate(`/home/jitsi/${req.roomId}`)}
-                                >
-                                    ビデオ通話
-                                </button>
+
                             </div>
 
                             <button

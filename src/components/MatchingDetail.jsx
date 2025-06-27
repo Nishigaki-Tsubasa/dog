@@ -88,7 +88,12 @@ const MatchingDetail = () => {
             <h4>{request.genre} / {request.menu}</h4>
             <p>日時: {request.startTime.toDate().toLocaleString()}</p>
             <p>所要時間: {Math.round(request.durationHours * 60)}分</p>
-            <p>オンラインURL: <a href={request.location} target="_blank" rel="noopener noreferrer">{request.location}</a></p>
+            <button
+                className="btn btn-outline-primary flex-grow-1"
+                onClick={() => navigate(`/home/jitsi/${req.roomId}`)}
+            >
+                ビデオ通話
+            </button>
             <p>投稿者: {usernames[request.uid] || '匿名'}</p>
 
 

@@ -140,9 +140,8 @@ function Home() {
                 </div>
 
                 {/* メイン表示エリア */}
-                <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4">
+                <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4" style={{ height: '100vh', paddingTop: 0 }}>
 
-                    {/* <JitsiMeet roomName="dev-meet-01" displayName="西垣" /> */}
 
                     <Routes>
                         <Route path="*" element={<HomeComponents />} />

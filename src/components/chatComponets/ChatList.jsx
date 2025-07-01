@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, where, orderBy, onSnapshot, doc, getDoc } from 'firebase/firestore';
+import {
+    collection,
+    query,
+    where,
+    orderBy,
+    onSnapshot,
+    doc,
+    getDoc,
+    getDocs,
+    limit
+} from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { db } from '../../firebase/firebase';
 import { useNavigate } from 'react-router-dom';
@@ -42,17 +52,35 @@ const ChatList = () => {
                 const room = { id: docSnap.id, ...docSnap.data() };
                 const otherUid = room.members.find(uid => uid !== currentUserId);
 
-                // 相手の名前をキャッシュ取得
+                // 相手の名前キャッシュ取得
                 if (!userMapTemp[otherUid]) {
                     const userDoc = await getDoc(doc(db, 'users', otherUid));
-                    if (userDoc.exists()) {
-                        userMapTemp[otherUid] = userDoc.data().username || '相手ユーザー';
-                    } else {
-                        userMapTemp[otherUid] = '相手ユーザー';
-                    }
+                    userMapTemp[otherUid] = userDoc.exists()
+                        ? userDoc.data().username || '相手ユーザー'
+                        : '相手ユーザー';
                 }
 
                 room.otherUserName = userMapTemp[otherUid];
+
+                // 🔽 未読件数の取得
+                const messagesRef = collection(db, `chatRooms/${room.id}/messages`);
+                const messageQuery = query(messagesRef, orderBy('timestamp', 'desc'));
+                const messageSnap = await getDocs(messageQuery);
+
+                let unreadCount = 0;
+                let isUnread = false;
+
+                messageSnap.forEach(doc => {
+                    const msg = doc.data();
+                    if (msg.uid !== currentUserId && !(msg.readBy?.includes(currentUserId))) {
+                        unreadCount++;
+                        isUnread = true;
+                    }
+                });
+
+                room.unreadCount = unreadCount;
+                room.unread = { [currentUserId]: isUnread };
+
                 rooms.push(room);
             }
 
@@ -89,7 +117,11 @@ const ChatList = () => {
                                     <small className="text-muted d-block">
                                         {room.updatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </small>
-                                    {isUnread && <span className="badge bg-danger mt-1">新着</span>}
+                                    {isUnread && (
+                                        <span className="badge bg-danger mt-1">
+                                            {room.unreadCount}件
+                                        </span>
+                                    )}
                                 </div>
                             </li>
                         );

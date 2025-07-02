@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
-    collection,
-    query,
-    where,
-    orderBy,
-    onSnapshot,
-    doc,
-    getDoc,
-    getDocs,
-    limit
+    collection, query, where, orderBy, onSnapshot,
+    doc, getDoc, getDocs, limit
 } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { db } from '../../firebase/firebase';
@@ -18,23 +11,17 @@ const ChatList = () => {
     const [chatRooms, setChatRooms] = useState([]);
     const [currentUserId, setCurrentUserId] = useState(null);
     const [userMap, setUserMap] = useState({});
+    const [loading, setLoading] = useState(true); // ← 追加
     const navigate = useNavigate();
 
-    // 認証状態取得
     useEffect(() => {
         const auth = getAuth();
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setCurrentUserId(user.uid);
-            } else {
-                setCurrentUserId(null);
-                setChatRooms([]);
-            }
+            setCurrentUserId(user ? user.uid : null);
         });
         return () => unsubscribeAuth();
     }, []);
 
-    // チャットルーム取得
     useEffect(() => {
         if (!currentUserId) return;
 
@@ -45,14 +32,16 @@ const ChatList = () => {
         );
 
         const unsubscribe = onSnapshot(q, async (snapshot) => {
+            setLoading(true); // ← 追加
+
             const rooms = [];
             const userMapTemp = { ...userMap };
 
-            for (const docSnap of snapshot.docs) {
+            await Promise.all(snapshot.docs.map(async (docSnap) => {
                 const room = { id: docSnap.id, ...docSnap.data() };
                 const otherUid = room.members.find(uid => uid !== currentUserId);
 
-                // 相手の名前キャッシュ取得
+                // ユーザー名取得（キャッシュ）
                 if (!userMapTemp[otherUid]) {
                     const userDoc = await getDoc(doc(db, 'users', otherUid));
                     userMapTemp[otherUid] = userDoc.exists()
@@ -62,9 +51,12 @@ const ChatList = () => {
 
                 room.otherUserName = userMapTemp[otherUid];
 
-                // 🔽 未読件数の取得
-                const messagesRef = collection(db, `chatRooms/${room.id}/messages`);
-                const messageQuery = query(messagesRef, orderBy('timestamp', 'desc'));
+                // 🔽 未読メッセージ取得（最新20件のみ）
+                const messageQuery = query(
+                    collection(db, `chatRooms/${room.id}/messages`),
+                    orderBy('timestamp', 'desc'),
+                    limit(20)
+                );
                 const messageSnap = await getDocs(messageQuery);
 
                 let unreadCount = 0;
@@ -82,10 +74,11 @@ const ChatList = () => {
                 room.unread = { [currentUserId]: isUnread };
 
                 rooms.push(room);
-            }
+            }));
 
             setUserMap(userMapTemp);
             setChatRooms(rooms);
+            setLoading(false); // ← 追加
         });
 
         return () => unsubscribe();
@@ -96,7 +89,9 @@ const ChatList = () => {
     return (
         <div className="container py-3">
             <h2 className="mb-4">トーク</h2>
-            {chatRooms.length === 0 ? (
+            {loading ? (
+                <p>読み込み中...</p>
+            ) : chatRooms.length === 0 ? (
                 <p>まだチャットはありません。</p>
             ) : (
                 <ul className="list-group">
@@ -110,18 +105,14 @@ const ChatList = () => {
                                 style={{ cursor: 'pointer' }}
                             >
                                 <div className="d-flex align-items-center">
-                                    {/* 左：アイコン */}
                                     <div className="me-1" style={{ width: '40px', flexShrink: 0 }}>
                                         <i className="bi bi-person-circle fs-3 text-secondary" />
                                     </div>
-
-                                    {/* 右：名前とメッセージを縦並び */}
                                     <div className="d-flex flex-column justify-content-center">
                                         <strong className="mb-1">{room.otherUserName}</strong>
                                         <small className="text-muted">{room.lastMessage || 'メッセージなし'}</small>
                                     </div>
                                 </div>
-
                                 <div className="text-end">
                                     <small className="text-muted d-block">
                                         {room.updatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

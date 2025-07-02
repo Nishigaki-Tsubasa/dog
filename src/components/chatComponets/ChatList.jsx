@@ -95,7 +95,7 @@ const ChatList = () => {
 
     return (
         <div className="container py-3">
-            <h4 className="mb-4">チャット一覧</h4>
+            <h2 className="mb-4">トーク</h2>
             {chatRooms.length === 0 ? (
                 <p>まだチャットはありません。</p>
             ) : (
@@ -109,10 +109,19 @@ const ChatList = () => {
                                 onClick={() => navigate(`/home/chat/${room.id}`)}
                                 style={{ cursor: 'pointer' }}
                             >
-                                <div>
-                                    <strong className="d-block">{room.otherUserName}</strong>
-                                    <small className="text-muted">{room.lastMessage || 'メッセージなし'}</small>
+                                <div className="d-flex align-items-center">
+                                    {/* 左：アイコン */}
+                                    <div className="me-1" style={{ width: '40px', flexShrink: 0 }}>
+                                        <i className="bi bi-person-circle fs-3 text-secondary" />
+                                    </div>
+
+                                    {/* 右：名前とメッセージを縦並び */}
+                                    <div className="d-flex flex-column justify-content-center">
+                                        <strong className="mb-1">{room.otherUserName}</strong>
+                                        <small className="text-muted">{room.lastMessage || 'メッセージなし'}</small>
+                                    </div>
                                 </div>
+
                                 <div className="text-end">
                                     <small className="text-muted d-block">
                                         {room.updatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

@@ -54,9 +54,30 @@ function Login() {
     };
 
     return (
-        <div className="container d-flex justify-content-center align-items-center bg-light" style={{ minHeight: '100vh' }}>
+        // 全体
+        <div className="container d-flex flex-column justify-content-center align-items-center "
+            style={{
+                minHeight: '100vh',
+                backgroundColor: '#ffe8d9',
+            }}>
+            {/* アプリ名 */}
+            <header className="mb-4 w-100 text-center">
+                <h1
+                    style={{
+                        fontSize: '90px',
+                        color: '#ff9e5e',
+                        fontFamily: "'M PLUS Rounded 1c', sans-serif", 
+                        userSelect: 'none',
+                    }}
+                >meeple</h1>
+            </header>
+            {/* ログインカード */}
             <div className="card p-4 shadow rounded-4 w-100" style={{ maxWidth: '400px' }}>
-                <h2 className="text-center mb-4 fw-bold text-success">ログイン</h2>
+                <h2 className="text-center mb-4 fw-bold"
+                    style={{
+                        color: '#ff9e5e',
+                        userSelect: 'none',
+                    }}>ログイン</h2>
 
                 {error && <div className="alert alert-danger">{error}</div>}
 
@@ -86,7 +107,13 @@ function Login() {
                     </div>
 
                     <div className="d-grid">
-                        <button type="submit" className="btn btn-success btn-lg rounded-pill shadow-sm">
+                        <button type="submit" className="btn btn-success btn-lg rounded-pill shadow-sm"
+                            style={{
+                                backgroundColor: '#ff9e5e',
+                                color: 'white',
+                                border: 'none'
+                            }}
+                        >
                             ログイン
                         </button>
                     </div>
@@ -120,7 +147,7 @@ function Login() {
                                 }
                             }}
                             style={{
-                                color: '#0d6efd',
+                                color: '#ff9e5e',
                                 textDecoration: 'underline',
                                 cursor: 'pointer',
                             }}

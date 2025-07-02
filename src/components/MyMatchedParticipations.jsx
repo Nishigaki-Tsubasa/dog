@@ -135,7 +135,14 @@ const MyMatchedParticipationsOnly = () => {
 
                             <p style={{ fontSize: 14, color: '#34495e', marginBottom: 12 }}>
                                 <strong>投稿者:</strong> {hostName}<br />
-                                <strong>日時:</strong> {startDate.toLocaleString()} （{durationMinutes}分）
+                                <strong>日時:</strong> {startDate.toLocaleString([], {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false
+                                })} （{durationMinutes}分）
                             </p>
 
                             <button

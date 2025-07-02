@@ -66,7 +66,12 @@ function Home() {
     };
 
     return (
-        <div className="container-fluid">
+        <div className="container-fluid"
+            style={{
+                minHeight: '100vh',
+                backgroundColor: '#ffe8d9',
+            }}>
+
             <div className="row min-vh-100">
 
                 {/* モバイル用ハンバーガーボタン */}

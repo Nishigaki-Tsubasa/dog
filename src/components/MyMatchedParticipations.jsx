@@ -84,7 +84,7 @@ const MyMatchedParticipationsOnly = () => {
 
     return (
         <div className="container mt-4" style={{ maxWidth: 700 }}>
-            <h2 className="mb-4 border-bottom text-center" style={{ fontWeight: '700', color: '#333' }}>
+            <h2 className="mb-4 border-bottom text-center fw-bold text-dark">
                 マッチングした食事の一覧
             </h2>
 
@@ -101,30 +101,17 @@ const MyMatchedParticipationsOnly = () => {
                     return (
                         <div
                             key={req.id}
-                            className="shadow-sm mb-4"
-                            style={{
-                                borderRadius: 12,
-                                padding: 20,
-                                background: '#fff', // 真っ白
-                                boxShadow: '0 4px 10px rgba(0,0,0,0.08)', // 柔らかい薄い影
-                                transition: 'transform 0.3s',
-                            }}
+                            className="shadow-sm mb-4 p-4 rounded bg-white"
+                            style={{ transition: 'transform 0.3s' }}
                             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
                             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                         >
-                            <div className="d-flex justify-content-between align-items-center mb-2">
-                                <h5 style={{ color: '#2c3e50', fontWeight: 600 }}>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <h5 className="text-primary fw-semibold mb-0">
                                     {req.genre} {req.menu && `/ ${req.menu}`}
                                 </h5>
                                 <button
-                                    className="btn btn-sm"
-                                    style={{
-                                        minWidth: 100,
-                                        backgroundColor: '#ecf0f1', // 淡いグレー青み
-                                        color: '#34495e',
-                                        border: 'none',
-                                        boxShadow: 'none',
-                                    }}
+                                    className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
                                     onClick={() => toggleExpand(req.id)}
                                     aria-expanded={expandedId === req.id}
                                     aria-controls={`details-${req.id}`}
@@ -133,7 +120,7 @@ const MyMatchedParticipationsOnly = () => {
                                 </button>
                             </div>
 
-                            <p style={{ fontSize: 14, color: '#34495e', marginBottom: 12 }}>
+                            <p className="text-secondary small mb-3">
                                 <strong>投稿者:</strong> {hostName}<br />
                                 <strong>日時:</strong> {startDate.toLocaleString([], {
                                     year: 'numeric',
@@ -146,16 +133,7 @@ const MyMatchedParticipationsOnly = () => {
                             </p>
 
                             <button
-                                className="btn d-flex align-items-center justify-content-center gap-2 mb-3"
-                                style={{
-                                    width: '100%',
-                                    fontWeight: '600',
-                                    fontSize: 16,
-                                    backgroundColor: '#3498db', // 落ち着いた青
-                                    color: '#fff',
-                                    border: 'none',
-                                    boxShadow: '0 2px 6px rgba(52,152,219,0.4)',
-                                }}
+                                className="btn btn-primary w-100 mb-3 d-flex align-items-center justify-content-center gap-2 fw-semibold"
                                 onClick={() => navigate(`/home/jitsi/${req.roomId}`)}
                             >
                                 <FaVideo size={18} /> ビデオ通話へ移動
@@ -164,60 +142,90 @@ const MyMatchedParticipationsOnly = () => {
                             <div
                                 id={`details-${req.id}`}
                                 style={{
-                                    maxHeight: expandedId === req.id ? 500 : 0,
+                                    maxHeight: expandedId === req.id ? '500px' : 0,
                                     overflow: 'hidden',
                                     transition: 'max-height 0.4s ease',
                                 }}
                             >
-                                <h6 style={{ borderBottom: '1px solid #bdc3c7', paddingBottom: 8, marginBottom: 12, color: '#2c3e50' }}>
+                                <h6 className="border-bottom pb-2 mb-3 text-primary fw-semibold">
                                     参加者一覧
                                 </h6>
 
+                                {/* 投稿者を表示（自分が参加者の時） */}
+                                {!req.isHost && user.uid !== req.uid && (
+                                    <div className="d-flex align-items-center justify-content-between mb-3 p-2 bg-info bg-opacity-10 rounded shadow-sm">
+                                        <div className="d-flex align-items-center gap-2 fw-semibold text-primary">
+                                            <FaUserCircle size={26} />
+                                            <span>{usernamesMap[req.uid] || '匿名ホスト'}</span>
+                                        </div>
+                                        <div className="d-flex gap-2 flex-wrap">
+                                            <button
+                                                className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                                                onClick={() => navigate(`/home/profile/${req.uid}`)}
+                                                aria-label={`投稿者プロフィール確認 ${usernamesMap[req.uid] || '匿名ホスト'}`}
+                                            >
+                                                <FaUserCircle /> プロフィール
+                                            </button>
+                                            <button
+                                                className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+                                                onClick={() => navigate(`/home/chatStart/${req.uid}`)}
+                                                aria-label={`投稿者へチャット開始 ${usernamesMap[req.uid] || '匿名ホスト'}`}
+                                            >
+                                                <FaComments /> チャット
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* 参加者一覧（自分は除外） */}
                                 {req.participants && req.participants.length > 0 ? (
-                                    req.participants.map(uid => (
+                                    req.participants.filter(uid => uid !== user.uid).map(uid => (
                                         <div
                                             key={uid}
-                                            className="d-flex align-items-center justify-content-between mb-2"
-                                            style={{
-                                                background: '#f9f9f9',
-                                                borderRadius: 8,
-                                                padding: '6px 12px',
-                                                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                                            }}
+                                            className="d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded shadow-sm"
                                         >
-                                            <div className="d-flex align-items-center gap-2" style={{ fontWeight: 500, color: '#34495e' }}>
+                                            <div className="d-flex align-items-center gap-2 fw-medium text-secondary">
                                                 <FaUserCircle size={24} color="#2980b9" />
                                                 <span>{usernamesMap[uid] || uid}</span>
                                             </div>
-                                            <div className="d-flex gap-2">
+                                            <div className="d-flex gap-2 flex-wrap">
                                                 <button
-                                                    className="btn btn-outline-secondary btn-sm"
+                                                    className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
                                                     onClick={() => navigate(`/home/profile/${uid}`)}
                                                     aria-label={`プロフィール確認 ${usernamesMap[uid] || uid}`}
-                                                    style={{ color: '#34495e', borderColor: '#ecf0f1' }}
                                                 >
-                                                    プロフィール
+                                                    <FaUserCircle />
+                                                    <span className="btn-text">プロフィール</span>
                                                 </button>
                                                 <button
-                                                    className="btn btn-outline-primary btn-sm"
+                                                    className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
                                                     onClick={() => navigate(`/home/chatStart/${uid}`)}
                                                     aria-label={`チャット開始 ${usernamesMap[uid] || uid}`}
-                                                    style={{ color: '#3498db', borderColor: '#ecf0f1' }}
                                                 >
-                                                    チャット
+                                                    <FaComments />
+                                                    <span className="btn-text">チャット</span>
                                                 </button>
+
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <p style={{ color: '#7f8c8d' }}>参加者はいません。</p>
+                                    <p className="text-muted">参加者はいません。</p>
                                 )}
                             </div>
                         </div>
-
                     );
                 })
             )}
+
+            <style>{`
+  @media (max-width: 767.98px) {
+    .btn-text {
+      display: none;
+    }
+  }
+`}</style>
+
         </div>
     );
 };

@@ -19,6 +19,7 @@ import OffcanvasSidebar from '../components/OffcanvasSidebar';
 import JitsiMeet from '../components/JitsiMeet';
 import NotificationIcon from '../components/NotificationIcon';
 import Notifications from '../components/Notifications';
+import colors from '../color';
 
 
 const Placeholder = ({ title }) => (
@@ -66,10 +67,12 @@ function Home() {
     };
 
     return (
+        // メイン
         <div className="container-fluid"
             style={{
                 minHeight: '100vh',
-                backgroundColor: '#ffe8d9',
+                backgroundColor: colors.mainBg,
+                color: colors.text,
             }}>
 
             <div className="row min-vh-100">
@@ -85,7 +88,15 @@ function Home() {
                 </div>
 
                 {/* デスクトップ用サイドバー */}
-                <nav className="col-md-3 col-lg-2 d-none d-md-block bg-white border-end shadow-sm p-3">
+                <nav className="col-md-3 col-lg-2 d-none d-md-block border-end shadow-sm p-3"
+                    style={{
+                        minHeight: '100vh',
+                        backgroundColor: colors.sidebarBg,
+                        color: colors.sidebarText,
+                        fontWeight: colors.sidebarFontWeight, 
+                        fontFamily: colors.sidebarFont,
+                    }}
+                >
                     <h4 className="fw-bold mb-4 border-bottom pb-2">メニュー</h4>
 
                     <div className="mb-4 p-3 bg-light rounded shadow-sm d-flex align-items-center gap-3">
@@ -110,28 +121,33 @@ function Home() {
 
                     <ul className="nav flex-column gap-2">
                         <li className="nav-item">
-                            <Link className="nav-link" to="/home/">🏠 ホーム</Link>
+                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/">🏠 ホーム</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/home/mealList">🍽 参加申し込み</Link>
+                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/mealList">🍽 参加申し込み</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/home/matchingsRequests">📌 食事リクエスト</Link>
+                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/matchingsRequests">📌 食事リクエスト</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/home/matching">🤝 マッチング済み</Link>
+                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/matching">🤝 マッチング済み</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/home/chat">💬 チャット</Link>
+                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/chat">💬 チャット</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/home/EditProfile">✏️ プロフィール編集</Link>
+                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/EditProfile">✏️ プロフィール編集</Link>
                         </li>
                     </ul>
 
                     <div className="mt-4">
                         <button
                             onClick={handleLogout}
+                            style={{
+                                backgroundColor: colors.buttonBg,
+                                color: colors.buttonText,
+                                border: `1px solid ${colors.buttonBg}`,
+                            }}
                             className="btn btn-outline-danger w-100 rounded-pill"
                         >
                             <i className="bi bi-box-arrow-right"></i> ログアウト

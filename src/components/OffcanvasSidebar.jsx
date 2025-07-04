@@ -1,97 +1,43 @@
-import React, { useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import SidebarMenuItems from './SidebarMenuItems';
+import { Offcanvas } from 'bootstrap';
+import { useEffect } from 'react';
 
-function OffcanvasSidebar({ username, onLogout }) {
-    const offcanvasRef = useRef();
-
+const OffcanvasSidebar = ({ id, username, onLogout }) => {
     useEffect(() => {
-        // BootstrapのOffcanvasインスタンスを作成
-        const offcanvasElement = offcanvasRef.current;
-        if (offcanvasElement && window.bootstrap) {
-            const offcanvasInstance = new window.bootstrap.Offcanvas(offcanvasElement);
-
-            // グローバル関数をセットして外部からshow()可能に
-            window.showSidebar = () => {
-                offcanvasInstance.show();
-            };
-        }
+        const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
     }, []);
 
-    // ナビリンククリック時にサイドバーを閉じる関数
-    const handleLinkClick = () => {
-        if (window.bootstrap) {
-            const offcanvasInstance = window.bootstrap.Offcanvas.getInstance(offcanvasRef.current);
-            offcanvasInstance?.hide();
-        }
-    };
-
     return (
-        <div
-            className="offcanvas offcanvas-start"
-            tabIndex="-1"
-            id="mobileSidebar"
-            ref={offcanvasRef}
-        >
+        <div className="offcanvas offcanvas-start" tabIndex="-1" id={id} aria-labelledby={`${id}Label`}>
             <div className="offcanvas-header">
-                <h5 className="offcanvas-title">メニュー</h5>
-                <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="offcanvas"
-                    aria-label="閉じる"
-                ></button>
+                <h5 id={`${id}Label`} className="offcanvas-title">メニュー</h5>
+                <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="閉じる" />
             </div>
-            <div className="offcanvas-body">
-                <p className="text-muted mb-3">ログイン中: {username || '名無し'}</p>
-                <ul className="nav flex-column">
-                    <li className="nav-item">
-                        <Link to="/home/" className="nav-link" onClick={handleLinkClick}>
-                            🏠 ホーム
-                        </Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link to="/home/mealList" className="nav-link" onClick={handleLinkClick}>
-                            🍽 参加申し込み
-                        </Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link
-                            to="/home/matchingsRequests"
-                            className="nav-link"
-                            onClick={handleLinkClick}
-                        >
-                            📌 食事リクエスト
-                        </Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link to="/home/matching" className="nav-link" onClick={handleLinkClick}>
-                            🤝 マッチング済み
-                        </Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link to="/home/chat" className="nav-link" onClick={handleLinkClick}>
-                            💬 チャット
-                        </Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link to="/home/EditProfile" className="nav-link" onClick={handleLinkClick}>
-                            ✏️ プロフィール編集
-                        </Link>
-                    </li>
-                </ul>
-
-                <button
-                    className="btn btn-danger mt-4 w-100"
-                    onClick={() => {
-                        onLogout();
-                        handleLinkClick();
-                    }}
-                >
-                    ログアウト
-                </button>
+            <div className="offcanvas-body d-flex flex-column">
+                <div className="mb-3">
+                    <div className="d-flex align-items-center gap-2">
+                        <i className="bi bi-person-circle fs-3 text-primary"></i>
+                        <div>
+                            <div className="text-muted small">ようこそ</div>
+                            <div className="fw-bold">{username ?? '名無し'}</div>
+                        </div>
+                    </div>
+                </div>
+                <nav className="nav flex-column gap-2">
+                    <SidebarMenuItems onLinkClick={() => {
+                        const el = document.getElementById(id);
+                        if (el) bootstrap.Offcanvas.getInstance(el)?.hide();
+                    }} />
+                </nav>
+                <div className="mt-auto">
+                    <button onClick={onLogout} className="btn btn-outline-danger w-100 rounded-pill">
+                        <i className="bi bi-box-arrow-right"></i> ログアウト
+                    </button>
+                </div>
             </div>
         </div>
     );
-}
+};
 
 export default OffcanvasSidebar;

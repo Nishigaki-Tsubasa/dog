@@ -146,45 +146,45 @@ function Home() {
                             style={{
                                 backgroundColor: colors.buttonBg,
                                 color: colors.buttonText,
-                                border: 1px solid ${colors.buttonBg},
+                                border: `1px solid ${colors.buttonBg}`,
                             }}
-                        className="btn btn-outline-danger w-100 rounded-pill"
+                            className="btn btn-outline-danger w-100 rounded-pill"
                         >
-                        <i className="bi bi-box-arrow-right"></i> ログアウト
-                    </button>
-            </div>
-        </nav>
+                            <i className="bi bi-box-arrow-right"></i> ログアウト
+                        </button>
+                    </div>
+                </nav>
 
-                {/* モバイル用オフキャンバスサイドバー */ }
-    <div className="d-md-none">
-        <OffcanvasSidebar username={username} onLogout={handleLogout} />
-    </div>
+                {/* モバイル用オフキャンバスサイドバー */}
+                <div className="d-md-none">
+                    <OffcanvasSidebar username={username} onLogout={handleLogout} />
+                </div>
 
-    {/* メイン表示エリア */ }
-    <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4">
+                {/* メイン表示エリア */}
+                <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-4">
 
-        {/* <JitsiMeet roomName="dev-meet-01" displayName="西垣" /> */}
+                    {/* <JitsiMeet roomName="dev-meet-01" displayName="西垣" /> */}
 
-        <Routes>
-            <Route path="*" element={<HomeComponents />} />
-            <Route path="new-request" element={<MealRegistrationForm />} />
-            <Route path="mealList" element={<MealList />} />
-            <Route path="matchingsRequests" element={<MatchingsRequests />} />
-            <Route path="matching" element={<Matching />} />
-            <Route path="matching/:requestId" element={<MatchingDetail />} />
-            <Route path="profile/:uid" element={<UserProfilePage />} />
-            <Route path="chat" element={<ChatList />} />
-            <Route path="/chat/:roomId" element={<ChatRoom />} />
-            <Route path="/chatStart/:userId" element={<ChatStart />} />
-            <Route path="/jitsi/:roomId" element={<JitsiMeet />} />
-            <Route path="/notifications" element={<Notifications />} />
+                    <Routes>
+                        <Route path="*" element={<HomeComponents />} />
+                        <Route path="new-request" element={<MealRegistrationForm />} />
+                        <Route path="mealList" element={<MealList />} />
+                        <Route path="matchingsRequests" element={<MatchingsRequests />} />
+                        <Route path="matching" element={<Matching />} />
+                        <Route path="matching/:requestId" element={<MatchingDetail />} />
+                        <Route path="profile/:uid" element={<UserProfilePage />} />
+                        <Route path="chat" element={<ChatList />} />
+                        <Route path="/chat/:roomId" element={<ChatRoom />} />
+                        <Route path="/chatStart/:userId" element={<ChatStart />} />
+                        <Route path="/jitsi/:roomId" element={<JitsiMeet />} />
+                        <Route path="/notifications" element={<Notifications />} />
 
-            <Route path="share" element={<Placeholder title="食事予定" />} />
-            <Route path="feedback" element={<Placeholder title="フィードバック" />} />
-            <Route path="history" element={<Placeholder title="履歴・健康データ" />} />
-            <Route path="EditProfile" element={<EditProfile />} />
-        </Routes>
-    </main>
+                        <Route path="share" element={<Placeholder title="食事予定" />} />
+                        <Route path="feedback" element={<Placeholder title="フィードバック" />} />
+                        <Route path="history" element={<Placeholder title="履歴・健康データ" />} />
+                        <Route path="EditProfile" element={<EditProfile />} />
+                    </Routes>
+                </main>
             </div >
         </div >
     );

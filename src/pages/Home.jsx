@@ -19,7 +19,8 @@ import OffcanvasSidebar from '../components/OffcanvasSidebar';
 import JitsiMeet from '../components/JitsiMeet';
 import NotificationIcon from '../components/NotificationIcon';
 import Notifications from '../components/Notifications';
-import colors from '../color';
+import colors from '../colors';
+import '../styles/Home.css'; // スタイルシートのインポート
 
 
 const Placeholder = ({ title }) => (
@@ -91,16 +92,25 @@ function Home() {
                 <nav className="col-md-3 col-lg-2 d-none d-md-block border-end shadow-sm p-3"
                     style={{
                         minHeight: '100vh',
-                        backgroundColor: colors.sidebarBg,
+                        backgroundColor: colors.subBg,
                         color: colors.sidebarText,
                         fontWeight: colors.sidebarFontWeight,
                         fontFamily: colors.sidebarFont,
+                        '--sidebar-hover-bg': colors.sidebarHoverBg,
+                        '--sidebar-hover-text': colors.sidebarHoverText,
                     }}
                 >
                     <h4 className="fw-bold mb-4 border-bottom pb-2">メニュー</h4>
 
-                    <div className="mb-4 p-3 bg-light rounded shadow-sm d-flex align-items-center gap-3">
-                        <i className="bi bi-person-circle fs-3 text-primary"></i>
+                    <div className="mb-4 p-3  rounded shadow-sm d-flex align-items-center gap-3"
+                        style={{
+                            backgroundColor: colors.mainBg,
+                            color: colors.sidebarText
+                        }}>
+                        <i className="bi bi-person-circle fs-3"
+                            style={{
+                                color: colors.accentBg,
+                            }}></i>
                         <div className="small flex-grow-1">
                             <div className="text-secondary">ようこそ、</div>
                             {loading ? (
@@ -121,22 +131,22 @@ function Home() {
 
                     <ul className="nav flex-column gap-2">
                         <li className="nav-item">
-                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/">🏠 ホーム</Link>
+                            <Link className="nav-link sidebarLink" to="/home/">🏠 ホーム</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/mealList">🍽 参加申し込み</Link>
+                            <Link className="nav-link sidebarLink" to="/home/mealList">🍽 参加申し込み</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/matchingsRequests">📌 食事リクエスト</Link>
+                            <Link className="nav-link sidebarLink"  to="/home/matchingsRequests">📌 食事リクエスト</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/matching">🤝 マッチング済み</Link>
+                            <Link className="nav-link sidebarLink" to="/home/matching">🤝 マッチング済み</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/chat">💬 チャット</Link>
+                            <Link className="nav-link sidebarLink" to="/home/chat">💬 チャット</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" style={{ color: colors.sidebarText }} to="/home/EditProfile">✏️ プロフィール編集</Link>
+                            <Link className="nav-link sidebarLink" to="/home/EditProfile">✏️ プロフィール編集</Link>
                         </li>
                     </ul>
 
@@ -144,9 +154,10 @@ function Home() {
                         <button
                             onClick={handleLogout}
                             style={{
-                                backgroundColor: colors.buttonBg,
+                                backgroundColor: colors.accentBg,
                                 color: colors.buttonText,
-                                border: `1px solid ${colors.buttonBg}`,
+                                border: `1px solid ${colors.accentBg}`,
+                                fontWeight: 'bold',
                             }}
                             className="btn btn-outline-danger w-100 rounded-pill"
                         >

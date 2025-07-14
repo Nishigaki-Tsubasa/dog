@@ -3,10 +3,14 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
+import { FaVideo, FaUserCircle, FaComments, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 const MyMatchedParticipationsOnly = () => {
     const [participantList, setParticipantList] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [expandedId, setExpandedId] = useState(null);
+    const [usernamesMap, setUsernamesMap] = useState({});
+
     const auth = getAuth();
     const user = auth.currentUser;
     const navigate = useNavigate();
@@ -14,44 +18,38 @@ const MyMatchedParticipationsOnly = () => {
     useEffect(() => {
         if (!user) return;
 
+        const fetchUsernames = async (uids) => {
+            const uniqueUids = Array.from(new Set(uids));
+            const map = {};
+            await Promise.all(uniqueUids.map(async (uid) => {
+                const userDoc = await getDoc(doc(db, 'users', uid));
+                map[uid] = userDoc.exists() ? (userDoc.data().username || '匿名') : '不明';
+            }));
+            return map;
+        };
+
         const fetchRequests = async () => {
             setLoading(true);
             const allRequests = [];
+            const now = new Date();
 
-            // ① 自分が参加者のリクエスト
             const q1 = query(collection(db, 'mealRequests'), where('participants', 'array-contains', user.uid));
             const snapshot1 = await getDocs(q1);
             for (const docSnap of snapshot1.docs) {
                 const data = docSnap.data();
-                let hostName = '匿名';
-                if (data.uid) {
-                    const hostDoc = await getDoc(doc(db, 'users', data.uid));
-                    hostName = hostDoc.exists() ? (hostDoc.data().username || '匿名') : '不明';
-                }
-                allRequests.push({
-                    id: docSnap.id,
-                    ...data,
-                    hostName,
-                    isHost: false,
-                });
+                if (!data.startTime || data.startTime.toDate() < now) continue;
+                allRequests.push({ id: docSnap.id, ...data, isHost: false });
             }
 
-            // ② 自分がホストで、参加者が1人以上いるリクエスト
             const q2 = query(collection(db, 'mealRequests'), where('uid', '==', user.uid));
             const snapshot2 = await getDocs(q2);
             for (const docSnap of snapshot2.docs) {
                 const data = docSnap.data();
-                if (data.participants && data.participants.length > 0) {
-                    allRequests.push({
-                        id: docSnap.id,
-                        ...data,
-                        hostName: user.username || '自分',
-                        isHost: true,
-                    });
-                }
+                if (!data.participants || data.participants.length === 0) continue;
+                if (!data.startTime || data.startTime.toDate() < now) continue;
+                allRequests.push({ id: docSnap.id, ...data, isHost: true });
             }
 
-            // 重複排除（同じリクエストにホストと参加者両方で該当した場合）
             const uniqueRequests = Object.values(
                 allRequests.reduce((acc, item) => {
                     acc[item.id] = item;
@@ -59,6 +57,18 @@ const MyMatchedParticipationsOnly = () => {
                 }, {})
             );
 
+            uniqueRequests.sort((a, b) => a.startTime.toDate() - b.startTime.toDate());
+
+            const allUids = uniqueRequests.flatMap(req => {
+                const uids = [];
+                if (req.uid) uids.push(req.uid);
+                if (req.participants) uids.push(...req.participants);
+                return uids;
+            });
+
+            const usernameMapResult = await fetchUsernames(allUids);
+
+            setUsernamesMap(usernameMapResult);
             setParticipantList(uniqueRequests);
             setLoading(false);
         };
@@ -66,64 +76,156 @@ const MyMatchedParticipationsOnly = () => {
         fetchRequests();
     }, [user]);
 
+    const toggleExpand = (id) => {
+        setExpandedId(prev => (prev === id ? null : id));
+    };
+
     if (!user) return <p className="text-center mt-4">ログインしてください</p>;
 
     return (
-        <div className="container mt-4">
-            <h2 className="mb-4 border-bottom">マッチングした食事の一覧</h2>
+        <div className="container mt-4" style={{ maxWidth: 700 }}>
+            <h2 className="mb-4 border-bottom text-center fw-bold text-dark">
+                マッチングした食事の一覧
+            </h2>
 
             {loading ? (
-                <div className="text-muted">読み込み中...</div>
+                <div className="text-muted text-center">読み込み中...</div>
             ) : participantList.length === 0 ? (
-                <p className="text-muted">マッチングした食事はありません</p>
+                <p className="text-muted text-center">マッチングした食事はありません</p>
             ) : (
-                participantList.map((req) => (
-                    <div key={req.id} className="card mb-3 shadow-sm">
-                        <div className="card-body">
-                            <h5 className="card-title">{req.genre} / {req.menu}</h5>
-                            <p className="card-text">
-                                <strong>投稿者:</strong> {req.hostName}<br />
-                                <strong>日時:</strong> {req.startTime.toDate().toLocaleString()}（{Math.round(req.durationHours * 60)}分）<br />
-                            </p>
+                participantList.map((req) => {
+                    const startDate = req.startTime.toDate();
+                    const durationMinutes = Math.round(req.durationHours * 60);
+                    const hostName = usernamesMap[req.uid] || '匿名';
 
-                            <div className="d-flex gap-2 mb-3">
-                                {/* <a
-                                    href={req.location}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn btn-outline-primary flex-grow-1"
-                                    style={{ textDecoration: 'none' }}
-                                >
-                                    URLを開く
-                                </a> */}
-
+                    return (
+                        <div
+                            key={req.id}
+                            className="shadow-sm mb-4 p-4 rounded bg-white"
+                            style={{ transition: 'transform 0.3s' }}
+                            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
+                            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                        >
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <h5 className="text-primary fw-semibold mb-0">
+                                    {req.genre} {req.menu && `/ ${req.menu}`}
+                                </h5>
                                 <button
-                                    className="btn btn-outline-primary flex-grow-1"
-                                    onClick={() => navigate(`/home/jitsi/${req.roomId}`)}
+                                    className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                                    onClick={() => toggleExpand(req.id)}
+                                    aria-expanded={expandedId === req.id}
+                                    aria-controls={`details-${req.id}`}
                                 >
-                                    ビデオ通話
+                                    {expandedId === req.id ? <><FaChevronUp /> 閉じる</> : <><FaChevronDown /> 詳細を見る</>}
                                 </button>
-
-                                <button
-                                    className="btn btn-outline-primary flex-grow-1"
-                                    onClick={() => navigate(`/home/chatStart/${req.uid}`)}
-                                >
-                                    チャット
-                                </button>
-
-
                             </div>
 
+                            <p className="text-secondary small mb-3">
+                                <strong>投稿者:</strong> {hostName}<br />
+                                <strong>日時:</strong> {startDate.toLocaleString([], {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false
+                                })} （{durationMinutes}分）
+                            </p>
+
                             <button
-                                className="btn btn-outline-primary btn-sm"
-                                onClick={() => navigate(`/home/matching/${req.id}`)}
+                                className="btn btn-primary w-100 mb-3 d-flex align-items-center justify-content-center gap-2 fw-semibold"
+                                onClick={() => navigate(`/home/jitsi/${req.roomId}`)}
                             >
-                                詳細を見る
+                                <FaVideo size={18} /> ビデオ通話へ移動
                             </button>
+
+                            <div
+                                id={`details-${req.id}`}
+                                style={{
+                                    maxHeight: expandedId === req.id ? '500px' : 0,
+                                    overflow: 'hidden',
+                                    transition: 'max-height 0.4s ease',
+                                }}
+                            >
+                                <h6 className="border-bottom pb-2 mb-3 text-primary fw-semibold">
+                                    参加者一覧
+                                </h6>
+
+                                {/* 投稿者を表示（自分が参加者の時） */}
+                                {!req.isHost && user.uid !== req.uid && (
+                                    <div className="d-flex align-items-center justify-content-between mb-3 p-2 bg-info bg-opacity-10 rounded shadow-sm">
+                                        <div className="d-flex align-items-center gap-2 fw-semibold text-primary">
+                                            <FaUserCircle size={26} />
+                                            <span>{usernamesMap[req.uid] || '匿名ホスト'}</span>
+                                        </div>
+                                        <div className="d-flex gap-2 flex-wrap">
+                                            <button
+                                                className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                                                onClick={() => navigate(`/home/profile/${req.uid}`)}
+                                                aria-label={`投稿者プロフィール確認 ${usernamesMap[req.uid] || '匿名ホスト'}`}
+                                            >
+                                                <FaUserCircle /> プロフィール
+                                            </button>
+                                            <button
+                                                className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+                                                onClick={() => navigate(`/home/chatStart/${req.uid}`)}
+                                                aria-label={`投稿者へチャット開始 ${usernamesMap[req.uid] || '匿名ホスト'}`}
+                                            >
+                                                <FaComments /> チャット
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* 参加者一覧（自分は除外） */}
+                                {req.participants && req.participants.length > 0 ? (
+                                    req.participants.filter(uid => uid !== user.uid).map(uid => (
+                                        <div
+                                            key={uid}
+                                            className="d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded shadow-sm"
+                                        >
+                                            <div className="d-flex align-items-center gap-2 fw-medium text-secondary">
+                                                <FaUserCircle size={24} color="#2980b9" />
+                                                <span>{usernamesMap[uid] || uid}</span>
+                                            </div>
+                                            <div className="d-flex gap-2 flex-wrap">
+                                                <button
+                                                    className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                                                    onClick={() => navigate(`/home/profile/${uid}`)}
+                                                    aria-label={`プロフィール確認 ${usernamesMap[uid] || uid}`}
+                                                >
+                                                    <FaUserCircle />
+                                                    <span className="btn-text">プロフィール</span>
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+                                                    onClick={() => navigate(`/home/chatStart/${uid}`)}
+                                                    aria-label={`チャット開始 ${usernamesMap[uid] || uid}`}
+                                                >
+                                                    <FaComments />
+                                                    <span className="btn-text">チャット</span>
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-muted">参加者はいません。</p>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))
+                    );
+                })
             )}
+
+            <style>{`
+  @media (max-width: 767.98px) {
+    .btn-text {
+      display: none;
+    }
+  }
+`}</style>
+
         </div>
     );
 };

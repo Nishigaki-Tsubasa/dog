@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase/firebase';
@@ -19,7 +19,10 @@ import OffcanvasSidebar from '../components/OffcanvasSidebar';
 import JitsiMeet from '../components/JitsiMeet';
 import NotificationIcon from '../components/NotificationIcon';
 import Notifications from '../components/Notifications';
+import WeeklyMealPlan from '../components/WeeklyMenu';
 
+import colors from '../colors';
+import '../styles/Home.css';
 
 const Placeholder = ({ title }) => (
     <div className="fs-4 text-secondary">{title}画面 - 準備中...</div>
@@ -30,6 +33,10 @@ function Home() {
     const location = useLocation();
     const [username, setUsername] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    const sidebarWidthOpen = 250;
+    const sidebarWidthClosed = 70;
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -65,110 +72,94 @@ function Home() {
         }
     };
 
+    const menuItems = [
+        { to: '/home/', icon: 'bi-house-door', label: 'ホーム' },
+        { to: '/home/mealList', icon: 'bi-pencil-square', label: '参加申し込み' },
+        { to: '/home/matchingsRequests', icon: 'bi-envelope', label: '食事リクエスト' },
+        { to: '/home/matching', icon: 'bi-people', label: 'マッチング済み' },
+        { to: '/home/chat', icon: 'bi-chat-dots', label: 'チャット' },
+        { to: '/home/EditProfile', icon: 'bi-person', label: 'プロフィール編集' },
+    ];
+
     return (
-        <div className="container-fluid"
-            style={{
-                minHeight: '100vh',
-                backgroundColor: '#ffe8d9',
-            }}>
+        <div
+            className="d-flex"
+            style={{ minHeight: '100vh', backgroundColor: colors.mainBg, color: colors.text }}
+        >
+            <nav
+                className="sidebar d-flex flex-column align-items-center align-items-md-start px-2 py-3 border-end"
+                style={{
+                    width: sidebarOpen ? sidebarWidthOpen : sidebarWidthClosed,
+                    backgroundColor: colors.subBg,
+                    transition: 'width 0.3s',
+                }}
+            >
+                <button
+                    className="btn btn-sm btn-outline-secondary mb-3"
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                >
+                    <i className={`bi ${sidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
+                </button>
 
-            <div className="row min-vh-100">
-
-                {/* モバイル用ハンバーガーボタン */}
-                <div className="d-md-none bg-light py-2 px-3 border-bottom w-100">
-                    <button
-                        className="btn btn-outline-primary"
-                        onClick={() => window.showSidebar()}
-                    >
-                        <i className="bi bi-list"></i> メニュー
-                    </button>
+                <div
+                    className="card mb-4 w-100"
+                    style={{ backgroundColor: colors.mainBg, border: 'none' }}
+                >
+                    <div className="card-body d-flex align-items-center">
+                        <i className="bi bi-person-circle fs-3 me-2" style={{ color: colors.accentBg }}></i>
+                        {sidebarOpen && (
+                            <div>
+                                <div className="small text-muted">ようこそ、</div>
+                                <div className="fw-bold text-dark text-truncate" style={{ maxWidth: '150px' }}>{username ?? '名無し'}</div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* デスクトップ用サイドバー */}
-                <nav className="col-md-3 col-lg-2 d-none d-md-block bg-white border-end shadow-sm p-3">
-                    <h4 className="fw-bold mb-4 border-bottom pb-2">メニュー</h4>
-
-                    <div className="mb-4 p-3 bg-light rounded shadow-sm d-flex align-items-center gap-3">
-                        <i className="bi bi-person-circle fs-3 text-primary"></i>
-                        <div className="small flex-grow-1">
-                            <div className="text-secondary">ようこそ、</div>
-                            {loading ? (
-                                <div className="text-secondary">読み込み中...</div>
-                            ) : (
-                                <div className="fw-bold text-dark">{username ?? '名無し'}</div>
-                            )}
-                        </div>
-                        {/* <NotificationIcon
-                            onClick={() => {
-                                // 通知一覧ページに遷移
-                                navigate('/home/notifications');
-                            }}
-                        /> */}
-                    </div>
-
-
-
-                    <ul className="nav flex-column gap-2">
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/home/">🏠 ホーム</Link>
+                <ul className="nav nav-pills flex-column w-100">
+                    {menuItems.map(({ to, icon, label }) => (
+                        <li key={to} className="nav-item">
+                            <Link to={to} className="nav-link d-flex align-items-center">
+                                <i className={`bi ${icon} fs-5`}></i>
+                                {sidebarOpen && <span className="ms-2">{label}</span>}
+                            </Link>
                         </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/home/mealList">🍽 参加申し込み</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/home/matchingsRequests">📌 食事リクエスト</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/home/matching">🤝 マッチング済み</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/home/chat">💬 チャット</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/home/EditProfile">✏️ プロフィール編集</Link>
-                        </li>
-                    </ul>
+                    ))}
+                </ul>
 
-                    <div className="mt-4">
-                        <button
-                            onClick={handleLogout}
-                            className="btn btn-outline-danger w-100 rounded-pill"
-                        >
-                            <i className="bi bi-box-arrow-right"></i> ログアウト
-                        </button>
-                    </div>
-                </nav>
+                <button
+                    onClick={handleLogout}
+                    className="btn btn-danger w-100 mt-auto d-flex align-items-center justify-content-center"
+                >
+                    <i className="bi bi-box-arrow-right"></i>
+                    {sidebarOpen && <span className="ms-2">ログアウト</span>}
+                </button>
+            </nav>
 
-                {/* モバイル用オフキャンバスサイドバー */}
-                <div className="d-md-none">
-                    <OffcanvasSidebar username={username} onLogout={handleLogout} />
-                </div>
-
-                {/* メイン表示エリア */}
-                <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4" style={{ height: '100vh', paddingTop: 0 }}>
-
-
-                    <Routes>
-                        <Route path="*" element={<HomeComponents />} />
-                        <Route path="new-request" element={<MealRegistrationForm />} />
-                        <Route path="mealList" element={<MealList />} />
-                        <Route path="matchingsRequests" element={<MatchingsRequests />} />
-                        <Route path="matching" element={<Matching />} />
-                        <Route path="matching/:requestId" element={<MatchingDetail />} />
-                        <Route path="profile/:uid" element={<UserProfilePage />} />
-                        <Route path="chat" element={<ChatList />} />
-                        <Route path="/chat/:roomId" element={<ChatRoom />} />
-                        <Route path="/chatStart/:userId" element={<ChatStart />} />
-                        <Route path="/jitsi/:roomId" element={<JitsiMeet />} />
-                        <Route path="/notifications" element={<Notifications />} />
-
-                        <Route path="share" element={<Placeholder title="食事予定" />} />
-                        <Route path="feedback" element={<Placeholder title="フィードバック" />} />
-                        <Route path="history" element={<Placeholder title="履歴・健康データ" />} />
-                        <Route path="EditProfile" element={<EditProfile />} />
-                    </Routes>
-                </main>
-            </div>
+            <main
+                className="flex-grow-1 px-3 py-4"
+                style={{ transition: 'margin 0.3s' }}
+            >
+                <Routes>
+                    <Route path="*" element={<HomeComponents />} />
+                    <Route path="new-request" element={<MealRegistrationForm />} />
+                    <Route path="mealList" element={<MealList />} />
+                    <Route path="matchingsRequests" element={<MatchingsRequests />} />
+                    <Route path="matching" element={<Matching />} />
+                    <Route path="matching/:requestId" element={<MatchingDetail />} />
+                    <Route path="profile/:uid" element={<UserProfilePage />} />
+                    <Route path="chat" element={<ChatList />} />
+                    <Route path="/chat/:roomId" element={<ChatRoom />} />
+                    <Route path="/chatStart/:userId" element={<ChatStart />} />
+                    <Route path="/jitsi/:roomId" element={<JitsiMeet />} />
+                    <Route path="/notifications" element={<Notifications />} />
+                    <Route path="/weekly-meal-plan" element={<WeeklyMealPlan />} />
+                    <Route path="share" element={<Placeholder title="食事予定" />} />
+                    <Route path="feedback" element={<Placeholder title="フィードバック" />} />
+                    <Route path="history" element={<Placeholder title="履歴・健康データ" />} />
+                    <Route path="EditProfile" element={<EditProfile />} />
+                </Routes>
+            </main>
         </div>
     );
 }

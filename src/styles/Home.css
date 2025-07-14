@@ -1,0 +1,10 @@
+nav .sidebarLink {
+  color: #333333;
+  text-decoration: none;
+  transition: color 0.2s;
+  padding: 0.5rem 1rem;
+}
+
+nav .sidebarLink:hover {
+  color: #ff6f61
+}

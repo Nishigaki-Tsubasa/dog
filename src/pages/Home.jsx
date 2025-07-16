@@ -19,7 +19,7 @@ import OffcanvasSidebar from '../components/OffcanvasSidebar';
 import JitsiMeet from '../components/JitsiMeet';
 import NotificationIcon from '../components/NotificationIcon';
 import Notifications from '../components/Notifications';
-import WeeklyMealPlan from '../components/WeeklyMenu';
+import RandomJapaneseMenu from '../components/RandomJapaneseMenu';
 
 import colors from '../colors';
 import '../styles/Home.css';
@@ -78,7 +78,8 @@ function Home() {
         { to: '/home/matchingsRequests', icon: 'bi-envelope', label: '食事リクエスト' },
         { to: '/home/matching', icon: 'bi-people', label: 'マッチング済み' },
         { to: '/home/chat', icon: 'bi-chat-dots', label: 'チャット' },
-        { to: '/home/EditProfile', icon: 'bi-person', label: 'プロフィール編集' },
+        { to: '/home/hogehoge', icon: 'bi-calendar', label: '週間メニュー' },
+        //{ to: '/home/EditProfile', icon: 'bi-person', label: 'プロフィール編集' },
     ];
 
     return (
@@ -94,28 +95,44 @@ function Home() {
                     transition: 'width 0.3s',
                 }}
             >
-                <button
-                    className="btn btn-sm btn-outline-secondary mb-3"
-                    onClick={() => setSidebarOpen(!sidebarOpen)}
-                >
-                    <i className={`bi ${sidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
-                </button>
+                <div className={`d-flex w-100 mb-2 ${sidebarOpen ? 'justify-content-end' : 'justify-content-center'}`}>
+                    <button
+                        className="btn btn-sm btn-outline-secondary d-flex"
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                    >
+                        <i className={`bi ${sidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
+                    </button>
+                </div>
+
 
                 <div
                     className="card mb-4 w-100"
                     style={{ backgroundColor: colors.mainBg, border: 'none' }}
                 >
-                    <div className="card-body d-flex align-items-center">
-                        <i className="bi bi-person-circle fs-3 me-2" style={{ color: colors.accentBg }}></i>
+                    {/* クリック可能なエリア */}
+                    <div
+                        className="card-body d-flex align-items-center"
+                        onClick={() => navigate('/home/EditProfile')}
+                        style={{ cursor: 'pointer' }} // マウスカーソルが手の形になる
+                    >
+                        <i
+                            className="bi bi-person-circle fs-3 me-2"
+                            style={{ color: colors.accentBg }}
+                        ></i>
                         {sidebarOpen && (
                             <div>
                                 <div className="small text-muted">ようこそ、</div>
-                                <div className="fw-bold text-dark text-truncate" style={{ maxWidth: '150px' }}>{username ?? '名無し'}</div>
+                                <div
+                                    className="fw-bold text-dark text-truncate"
+                                    style={{ maxWidth: '150px' }}
+                                >
+                                    {username ?? '名無し'}
+                                </div>
                             </div>
                         )}
                     </div>
                 </div>
-                {/* サイドメニュー関連 */}
+
                 <ul className="nav nav-pills flex-column w-100">
                     {menuItems.map(({ to, icon, label }) => (
                         <li key={to} className="nav-item">
@@ -159,10 +176,7 @@ function Home() {
                     <Route path="/chatStart/:userId" element={<ChatStart />} />
                     <Route path="/jitsi/:roomId" element={<JitsiMeet />} />
                     <Route path="/notifications" element={<Notifications />} />
-                    <Route path="/weekly-meal-plan" element={<WeeklyMealPlan />} />
-                    <Route path="share" element={<Placeholder title="食事予定" />} />
-                    <Route path="feedback" element={<Placeholder title="フィードバック" />} />
-                    <Route path="history" element={<Placeholder title="履歴・健康データ" />} />
+                    <Route path="/hogehoge" element={<RandomJapaneseMenu />} />
                     <Route path="EditProfile" element={<EditProfile />} />
                 </Routes>
             </main>

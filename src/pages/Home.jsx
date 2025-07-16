@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -115,14 +115,20 @@ function Home() {
                         )}
                     </div>
                 </div>
-
+                {/* サイドメニュー関連 */}
                 <ul className="nav nav-pills flex-column w-100">
                     {menuItems.map(({ to, icon, label }) => (
                         <li key={to} className="nav-item">
-                            <Link to={to} className="nav-link d-flex align-items-center">
+                            <NavLink
+                                to={to}
+                                end
+                                className={({ isActive }) =>
+                                    `nav-link sidebarLink d-flex align-items-center ${isActive ? 'active' : ''}`
+                                }
+                            >
                                 <i className={`bi ${icon} fs-5`}></i>
                                 {sidebarOpen && <span className="ms-2">{label}</span>}
-                            </Link>
+                            </NavLink>
                         </li>
                     ))}
                 </ul>

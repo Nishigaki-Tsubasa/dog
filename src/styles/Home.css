@@ -1,10 +1,36 @@
+/* Home.jsx */
+/* サイドメニューの通常状態 */
 nav .sidebarLink {
   color: #333333;
   text-decoration: none;
   transition: color 0.2s;
   padding: 0.5rem 1rem;
 }
-
+/* ホバー時 */
 nav .sidebarLink:hover {
-  color: #ff6f61
+  color: #ff6f61;
+}
+/* アクティブ状態（今いるページ） */
+nav .nav-link.sidebarLink.active {
+  background-color: #fdf2d1;
+  color: #ff6f61 !important;
+  font-weight: bold;
+
+}
+
+
+/* ログアウトボタンのスタイル */
+nav .logout-button button {
+  background-color: #ff6f61;
+  color: #ffffff;
+  border: 1px solid #ff6f61;
+  font-weight: bold;
+  width: 100%;
+  border-radius: 50rem; /* rounded-pill と同等 */
+  transition: background-color 0.3s, border-color 0.3s; /*遷移効果*/
+}
+nav .logout-button:hover button { /*ホバースタイル*/
+  background-color: #eb4233; /* 濃いめのホバー色 */
+  border-color: #e85a4d;
+  color: #ffffff; /* 必要なら変えてもOK */
 }

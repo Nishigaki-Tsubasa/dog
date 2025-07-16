@@ -64,7 +64,7 @@ const HomeComponents = () => {
                     食事の時間を登録して、一緒に食事する相手を見つけましょう。
                 </p>
                 <button
-                    className="btn btn-primary btn-lg"
+                    className="btn my-btn btn-lg"
                     onClick={() => navigate('/home/new-request')}
                 >
                     食事時間を登録する

@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 
 import { auth, db } from '../firebase/firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import '../colors.js';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -58,14 +59,14 @@ function Login() {
         <div className="container d-flex flex-column justify-content-center align-items-center "
             style={{
                 minHeight: '100vh',
-                backgroundColor: '#ffe8d9',
+                backgroundColor: '#fdfcf7',
             }}>
             {/* アプリ名 */}
             <header className="mb-4 w-100 text-center">
                 <h1
                     style={{
                         fontSize: '90px',
-                        color: '#ff9e5e',
+                        color: '#ff6f61',
                         fontFamily: "'M PLUS Rounded 1c', sans-serif", 
                         userSelect: 'none',
                     }}
@@ -75,7 +76,8 @@ function Login() {
             <div className="card p-4 shadow rounded-4 w-100" style={{ maxWidth: '400px' }}>
                 <h2 className="text-center mb-4 fw-bold"
                     style={{
-                        color: '#ff9e5e',
+                        color: '#ff6f61',
+                        fontSize: '30px',
                         userSelect: 'none',
                     }}>ログイン</h2>
 
@@ -109,7 +111,7 @@ function Login() {
                     <div className="d-grid">
                         <button type="submit" className="btn btn-success btn-lg rounded-pill shadow-sm"
                             style={{
-                                backgroundColor: '#ff9e5e',
+                                backgroundColor: '#ff6f61',
                                 color: 'white',
                                 border: 'none'
                             }}

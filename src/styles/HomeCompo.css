@@ -1,0 +1,19 @@
+/* ボタン：食事登録 */
+body{
+  user-select: none;
+}
+.Home-btn {
+  background-color: #ff6f61 !important; 
+  color: #ffffff !important;
+  border: 1px solid #ff6f61 !important;
+  font-weight: bold !important;
+  width: 100% !important;
+  border-radius: 50rem !important; /* rounded-pill と同等 */
+  transition: background-color 0.3s, border-color 0.3s !important; /*遷移効果*/
+}
+.Home-btn:hover { /*ホバースタイル*/
+  background-color: #ff4f3e !important; /* 濃いめのホバー色 */
+  border-color: #ff4f3e     !important;
+  color: #ffffff            !important; /* 必要なら変えてもOK */
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1) !important; /* ホバー時の影効果 */
+}

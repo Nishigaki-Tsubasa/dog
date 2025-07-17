@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
+import '../styles/HomeCompo.css';
 
 const HomeComponents = () => {
     const navigate = useNavigate();
@@ -64,7 +65,7 @@ const HomeComponents = () => {
                     食事の時間を登録して、一緒に食事する相手を見つけましょう。
                 </p>
                 <button
-                    className="btn my-btn btn-lg"
+                    className="btn Home-btn btn-lg"
                     onClick={() => navigate('/home/new-request')}
                 >
                     食事時間を登録する

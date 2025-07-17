@@ -4,6 +4,7 @@ import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
 import { FaVideo, FaUserCircle, FaComments, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import '../styles/MyMatchedCompo.css';
 
 const MyMatchedParticipationsOnly = () => {
     const [participantList, setParticipantList] = useState([]);
@@ -107,7 +108,7 @@ const MyMatchedParticipationsOnly = () => {
                             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                         >
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h5 className="text-primary fw-semibold mb-0">
+                                <h5 className="fw-semibold mb-0">
                                     {req.genre} {req.menu && `/ ${req.menu}`}
                                 </h5>
                                 <button
@@ -133,7 +134,7 @@ const MyMatchedParticipationsOnly = () => {
                             </p>
 
                             <button
-                                className="btn btn-primary w-100 mb-3 d-flex align-items-center justify-content-center gap-2 fw-semibold"
+                                className="btn MyMatched-btn w-100 mb-3 d-flex align-items-center justify-content-center gap-2 fw-semibold"
                                 onClick={() => navigate(`/home/jitsi/${req.roomId}`)}
                             >
                                 <FaVideo size={18} /> ビデオ通話へ移動
@@ -147,14 +148,16 @@ const MyMatchedParticipationsOnly = () => {
                                     transition: 'max-height 0.4s ease',
                                 }}
                             >
-                                <h6 className="border-bottom pb-2 mb-3 text-primary fw-semibold">
+                                <h6 className="border-bottom pb-2 mb-3 fw-semibold">
                                     参加者一覧
                                 </h6>
 
                                 {/* 投稿者を表示（自分が参加者の時） */}
                                 {!req.isHost && user.uid !== req.uid && (
-                                    <div className="d-flex align-items-center justify-content-between mb-3 p-2 bg-info bg-opacity-10 rounded shadow-sm">
-                                        <div className="d-flex align-items-center gap-2 fw-semibold text-primary">
+                                    <div className="d-flex align-items-center justify-content-between mb-3 p-2 bg-opacity-10 rounded shadow-sm"
+                                        style={{ backgroundColor: '#fffcf1' }}>
+                                        <div className="d-flex align-items-center gap-2 fw-semibold "
+                                            style={{ color: '#ff6f61' }}>
                                             <FaUserCircle size={26} />
                                             <span>{usernamesMap[req.uid] || '匿名ホスト'}</span>
                                         </div>
@@ -167,7 +170,7 @@ const MyMatchedParticipationsOnly = () => {
                                                 <FaUserCircle /> プロフィール
                                             </button>
                                             <button
-                                                className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+                                                className="btn MyMatched-btn2 btn-sm d-flex align-items-center gap-1"
                                                 onClick={() => navigate(`/home/chatStart/${req.uid}`)}
                                                 aria-label={`投稿者へチャット開始 ${usernamesMap[req.uid] || '匿名ホスト'}`}
                                             >
@@ -198,7 +201,7 @@ const MyMatchedParticipationsOnly = () => {
                                                     <span className="btn-text">プロフィール</span>
                                                 </button>
                                                 <button
-                                                    className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+                                                    className="btn MyMatched-btn2 btn-sm d-flex align-items-center gap-1"
                                                     onClick={() => navigate(`/home/chatStart/${uid}`)}
                                                     aria-label={`チャット開始 ${usernamesMap[uid] || uid}`}
                                                 >

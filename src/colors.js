@@ -1,4 +1,4 @@
-// color.js
+// colors.js
 const colors = {
   mainBg: '#fdfcf7',
   subBg: '#faf7ee',

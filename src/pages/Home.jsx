@@ -97,7 +97,7 @@ function Home() {
             >
                 <div className={`d-flex w-100 mb-2 ${sidebarOpen ? 'justify-content-end' : 'justify-content-center'}`}>
                     <button
-                        className="btn btn-sm btn-outline-secondary d-flex"
+                        className="my-btn"
                         onClick={() => setSidebarOpen(!sidebarOpen)}
                     >
                         <i className={`bi ${sidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
@@ -117,14 +117,14 @@ function Home() {
                     >
                         <i
                             className="bi bi-person-circle fs-3 me-2"
-                            style={{ color: colors.accentBg }}
+                            style={{ color: colors.accentBg, userSelect: 'none' }}
                         ></i>
                         {sidebarOpen && (
                             <div>
-                                <div className="small text-muted">ようこそ、</div>
+                                <div className="small text-muted" style={{userSelect: 'none'}}>ようこそ、</div>
                                 <div
                                     className="fw-bold text-dark text-truncate"
-                                    style={{ maxWidth: '150px' }}
+                                    style={{ maxWidth: '150px',userSelect: 'none', }}
                                 >
                                     {username ?? '名無し'}
                                 </div>

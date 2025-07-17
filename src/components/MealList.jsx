@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import ja from 'date-fns/locale/ja';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa';
+import '../styles/MealListCompo.css';
 
 const MealList = () => {
     const [requests, setRequests] = useState([]);
@@ -73,13 +74,13 @@ const MealList = () => {
         <div className="container py-5" style={{ maxWidth: 900 }}>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="fw-bold display-6 m-0">食事の一覧</h2>
-                <button
-                    className="btn btn-primary btn-md d-flex align-items-center gap-2"
-                    onClick={() => navigate('/home/new-request')}
-                    style={{ minWidth: 140 }}
-                >
-                    <FaPlus /> 新規投稿
-                </button>
+                    <button
+                        className="btn MealList-btn d-flex align-items-center"
+                        onClick={() => navigate('/home/new-request')}
+                        style={{ minWidth: 140 , justifyContent: 'center' }}
+                    >
+                        <FaPlus /> 新規投稿
+                    </button>
             </div>
 
             {requests.length === 0 ? (
@@ -99,10 +100,10 @@ const MealList = () => {
                                     <div className="card h-100 border-0 shadow rounded-4">
                                         <div className="card-body d-flex flex-column p-4">
                                             <h5
-                                                className="card-title text-primary fw-bold mb-3"
+                                                className="MealList-Name card-title fw-bold mb-3"
                                                 role="button"
                                                 onClick={() => navigate(`/home/profile/${req.uid}`)}
-                                                style={{ cursor: 'pointer', userSelect: 'none' }}
+                                                style={{ cursor: 'pointer', userSelect: 'none',}}
                                                 onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
                                                 onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
                                             >
@@ -122,14 +123,14 @@ const MealList = () => {
                                             <div className="mt-auto text-end">
                                                 {isApplyEnabled ? (
                                                     <button
-                                                        className="btn btn-primary btn-sm px-4 rounded-pill"
+                                                        className="btn MealList-btn btn-primary btn-sm px-4 rounded-pill"
                                                         onClick={() => handleApply(req)}
                                                     >
                                                         参加申請
                                                     </button>
                                                 ) : (
                                                     <button
-                                                        className={`btn btn-sm px-4 rounded-pill ${status === '承認済み'
+                                                        className={`btn my-btn btn-sm px-4 rounded-pill ${status === '承認済み'
                                                             ? 'btn-success'
                                                             : 'btn-secondary'
                                                             }`}

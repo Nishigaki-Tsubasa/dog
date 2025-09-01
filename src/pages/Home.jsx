@@ -78,7 +78,7 @@ function Home() {
         { to: '/home/matchingsRequests', icon: 'bi-envelope', label: '食事リクエスト' },
         { to: '/home/matching', icon: 'bi-people', label: 'マッチング済み' },
         { to: '/home/chat', icon: 'bi-chat-dots', label: 'チャット' },
-        { to: '/home/hogehoge', icon: 'bi-calendar', label: '週間メニュー' },
+        { to: '/home/hogehoge', icon: 'bi-calendar', label: 'メニュー' },
         //{ to: '/home/EditProfile', icon: 'bi-person', label: 'プロフィール編集' },
     ];
 
@@ -121,10 +121,10 @@ function Home() {
                         ></i>
                         {sidebarOpen && (
                             <div>
-                                <div className="small text-muted" style={{userSelect: 'none'}}>ようこそ、</div>
+                                <div className="small text-muted" style={{ userSelect: 'none' }}>ようこそ、</div>
                                 <div
                                     className="fw-bold text-dark text-truncate"
-                                    style={{ maxWidth: '150px',userSelect: 'none', }}
+                                    style={{ maxWidth: '150px', userSelect: 'none', }}
                                 >
                                     {username ?? '名無し'}
                                 </div>

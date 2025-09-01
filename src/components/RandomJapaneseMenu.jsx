@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 const RandomJapaneseMenu = () => {
     const [menu, setMenu] = useState(null);
-    const [history, setHistory] = useState([]); // 表示済みIDの履歴
+    const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -20,11 +20,9 @@ const RandomJapaneseMenu = () => {
             const data = await res.json();
             if (!data.result || data.result.length === 0) throw new Error("メニューがありません");
 
-            // 履歴にないものだけ抽出
             const filtered = data.result.filter(item => !history.includes(item.recipeId));
             let selected;
             if (filtered.length === 0) {
-                // 全履歴使い切ったら履歴リセットして全件から選ぶ
                 setHistory([]);
                 selected = data.result[Math.floor(Math.random() * data.result.length)];
             } else {
@@ -45,19 +43,48 @@ const RandomJapaneseMenu = () => {
     }, []);
 
     return (
-        <div style={{ maxWidth: 400, margin: "auto", textAlign: "center" }}>
-            <h1>今日のランチメニュー</h1>
-            {loading && <p>読み込み中...</p>}
-            {error && <p style={{ color: "red" }}>エラー: {error}</p>}
-            {menu && (
-                <>
-                    <h2>{menu.recipeTitle}</h2>
-                    <img src={menu.foodImageUrl} alt={menu.recipeTitle} style={{ width: "100%", borderRadius: 8 }} />
-                    <p>投稿者: {menu.nickname}</p>
-                    <a href={menu.recipeUrl} target="_blank" rel="noopener noreferrer">レシピを見る</a>
-                </>
-            )}
-            <button onClick={fetchMenu} disabled={loading} style={{ marginTop: 20 }}>メニューを再取得</button>
+        <div className="container mt-5">
+            <div className="row justify-content-center">
+                <div className="col-md-6">
+                    <h1 className="text-center mb-4">今日のランチメニュー</h1>
+
+                    {loading && <div className="alert alert-info">読み込み中...</div>}
+                    {error && <div className="alert alert-danger">エラー: {error}</div>}
+
+                    {menu && (
+                        <div className="card">
+                            <img
+                                src={menu.foodImageUrl}
+                                alt={menu.recipeTitle}
+                                className="card-img-top"
+                                style={{ borderRadius: '8px 8px 0 0' }}
+                            />
+                            <div className="card-body">
+                                <h5 className="card-title">{menu.recipeTitle}</h5>
+                                <p className="card-text">投稿者: {menu.nickname}</p>
+                                <a
+                                    href={menu.recipeUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn btn-primary"
+                                >
+                                    レシピを見る
+                                </a>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="d-grid mt-4">
+                        <button
+                            onClick={fetchMenu}
+                            disabled={loading}
+                            className="btn btn-success"
+                        >
+                            メニューを再取得
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

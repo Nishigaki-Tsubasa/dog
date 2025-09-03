@@ -1,3 +1,21 @@
+## Meeple
+
+## 使用技術
+
+- フロントエンド: React (JavaScript)
+- バックエンド: Firebase（Firestore + Authentication）
+- フレームワーク: Bootstrap
+- ビルドツール: Vite
+- ホスティング: Firebase Hosting
+
+
+## 実行環境
+- 開発エディター : Visual Studio Code
+- OS : Windows 11 Pro 
+- 検索エンジン : Google Chrome 
+
+
+
 ## Node.jsのインストール
 https://qiita.com/YurimyMiyu/items/d4fe132fc9bc8189eff4
 

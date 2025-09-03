@@ -38,6 +38,7 @@ npm i
 npm run dev
 ```
 コントロール + C 2回でサーバー停止
+
 http://localhost:5173
 をブラウザで開く
 

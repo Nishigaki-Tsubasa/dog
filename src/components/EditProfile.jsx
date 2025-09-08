@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { getDoc, doc, setDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebase';
+import '../styles/Profile.css'; // スタイルシートをインポート
 
 const EditProfile = () => {
     const [formData, setFormData] = useState({
         username: '',
         age: '',
-        gender: 'man',
+        gender: '',
         favoriteFoods: '',
         dislikedFoods: '',
         intro: '',
@@ -83,8 +84,8 @@ const EditProfile = () => {
             className="d-flex justify-content-center align-items-center bg-light"
 
         >
-            <div className="card shadow p-4 w-100" style={{ maxWidth: '800px' }}>
-                <h2 className="card-title mb-4">プロフィール編集</h2>
+            <div className="card shadow p-4 w-100" style={{ maxWidth: '800px', backgroundColor: '#fdfcf7', color: '#333333', fontWeight: 'bold' }}>
+                <h2 className="card-title mb-4" style={{ color: '#ff6f6e' }}>プロフィール編集</h2>
 
                 {/* 通知表示 */}
                 {saveMessage && (
@@ -123,6 +124,7 @@ const EditProfile = () => {
                             onChange={handleChange}
                             className="form-control"
                         >
+                            <option value="" disabled hidden>性別</option>   {/* 初期表示用 */}
                             <option value="man">男性</option>
                             <option value="woman">女性</option>
                             <option value="other">その他</option>
@@ -158,7 +160,7 @@ const EditProfile = () => {
                             className="form-control"
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary w-100">
+                    <button type="submit" className="btn Profile-btn btn-primary w-100">
                         保存する
                     </button>
                 </form>

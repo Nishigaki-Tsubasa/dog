@@ -14,7 +14,7 @@ import {
   limit,
 } from 'firebase/firestore';
 
-import './ChatRoom.css';
+import '../../styles/ChatRoom.css';
 
 const ChatRoom = () => {
   const { roomId } = useParams();
@@ -194,11 +194,11 @@ const ChatRoom = () => {
     <div className="container-fluid d-flex flex-column p-0 bg-light" style={{ height: '100dvh' }}>
       {/* ヘッダー */}
       <div
-        className="bg-white shadow-sm px-4 py-3 border-bottom d-flex align-items-center"
-        style={{ flexShrink: 0 }}
+        className="shadow-sm px-4 py-3 border-bottom d-flex align-items-center"
+        style={{ flexShrink: 0, }}
       >
         <button
-          className="btn btn-light border rounded-circle d-flex align-items-center justify-content-center me-3"
+          className="btn Chat-btn2 border rounded-circle d-flex align-items-center justify-content-center me-3"
           style={{ width: '40px', height: '40px' }}
           onClick={() => navigate('/home/chat')}
           title="戻る"
@@ -210,7 +210,7 @@ const ChatRoom = () => {
       </div>
 
       {/* メッセージエリア */}
-      <div className="flex-grow-1 overflow-auto px-3 py-3" style={{ minHeight: 0 }}>
+      <div className="flex-grow-1 overflow-auto px-3 py-3" style={{ minHeight: 0 , backgroundColor: '#faf7ee'}}>
         {groupedMessages.map(([dateKey, msgs]) => (
           <div key={dateKey} className="mb-4">
             <div className="text-center text-muted mb-3">{formatDateHeader(dateKey)}</div>
@@ -238,16 +238,19 @@ const ChatRoom = () => {
                   {!isMyMessage ? (
                     <div className="d-flex mb-2">
                       <div className="me-2" style={{ width: 40, flexShrink: 0 }}>
-                        <i className="bi bi-person-circle fs-3 text-secondary" />
+                        <i className="bi bi-person-circle fs-3" style={{ color: '#4f4f4fff' }}></i>
                       </div>
                       <div>
                         <div
-                          className="rounded-4 shadow-sm bg-white text-dark px-3 py-2 chat-bubble"
+                          className="rounded-4 shadow-sm px-3 py-2 chat-bubble"
                           style={{
                             whiteSpace: 'pre-wrap',
                             wordBreak: 'break-word',
                             marginTop: 5,
                             maxWidth: '60vw',
+                            backgroundColor: '#faf7ee',
+                            color: '#573939ff',
+                            fontweight: 'bold',
                           }}
                         >
                           {msg.text}
@@ -263,11 +266,13 @@ const ChatRoom = () => {
                   ) : (
                     <div className="text-end">
                       <div
-                        className="rounded-4 shadow-sm bg-success text-white px-3 py-2 chat-bubble"
+                        className="rounded-4 shadow-sm text-white px-3 py-2 chat-bubble"
                         style={{
                           whiteSpace: 'pre-wrap',
                           wordBreak: 'break-word',
                           maxWidth: '60vw',
+                          backgroundColor: '#ff6f61',
+                          color: '#FFFFFF',
                         }}
                       >
                         {msg.text}
@@ -295,7 +300,7 @@ const ChatRoom = () => {
       </div>
 
       {/* 入力欄 */}
-      <div className="bg-white px-3 py-2 border-top" style={{ flexShrink: 0 }}>
+      <div className="px-3 py-2 border-top bg-light" style={{ flexShrink: 0 ,}}>
         <div className="d-flex gap-2">
           <input
             type="text"
@@ -313,7 +318,7 @@ const ChatRoom = () => {
             disabled={sending}
           />
           <button
-            className="btn btn-success rounded-pill d-flex align-items-center justify-content-center"
+            className="btn Chat-btn btn-success rounded-pill d-flex align-items-center justify-content-center"
             onClick={handleSend}
             style={{ minWidth: '70px', padding: '0 16px' }}
             aria-label="送信"

@@ -1,22 +1,32 @@
-.MyMatched-btn{
+.Requests-btn{
   background-color: #ff6f61 !important; 
   color: #ffffff            !important;
   border: 1px solid #ff6f61 !important;
   font-weight: bold           !important;
+  border-radius: 50rem        !important; /* rounded-pill と同等 */
   transition: background-color 0.3s, border-color 0.3s !important; /*遷移効果*/
 }
-.MyMatched-btn:hover{
+.Requests-btn:hover{
   background-color: #ff4f3e !important; /* 濃いめのホバー色 */
   border-color: #ff4f3e     !important;
   color: #ffffff            !important; /* 必要なら変えてもOK */
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1) !important; /* ホバー時の影効果 */
 }
-.MyMatched-btn2 {
+.Requests-btn2 {
     border-color: #ff6f61   !important;
     color: #ff6f61          !important;
 }
-.MyMatched-btn2:hover {
+.Requests-btn2:hover {
     background-color: #ff6f61 !important;
     color: #ffffff            !important;
     border-color: #ff6f61     !important;
 }
+/* ポップアップ：戻る */
+.tooltip-btn {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8B5E3C; /* ボタンの色 */
+}
+

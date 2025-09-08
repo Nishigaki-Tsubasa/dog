@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase/firebase';
 import { useNavigate } from 'react-router-dom';
+import '../styles/Profile.css'; // スタイルシートをインポート
 
 function ProfileForm() {
     const [formData, setFormData] = useState({
         username: '',
         age: '',
-        gender: 'man',
+        gender: '',
         favoriteFoods: '',
         dislikedFoods: '',
         intro: ''
@@ -46,7 +47,9 @@ function ProfileForm() {
                 className="card shadow-sm border-0 p-4 rounded-4"
                 style={{ width: '100%', maxWidth: '700px' }}
             >
-                <h2 className="text-center mb-4 fw-bold text-primary">プロフィール登録</h2>
+                <h2 className="text-center mb-4 fw-bold"
+                    style={{ color: '#ff6f61', fontWeight: 'bold' }}>
+                    プロフィール登録</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label htmlFor="username" className="form-label small">名前</label>
@@ -86,6 +89,7 @@ function ProfileForm() {
                             onChange={handleChange}
                             className="form-select form-select-sm rounded-pill"
                         >
+                            <option value="" disabled hidden>性別</option>   {/* 初期表示用 */}
                             <option value="man">男性</option>
                             <option value="woman">女性</option>
                             <option value="other">その他</option>
@@ -131,7 +135,7 @@ function ProfileForm() {
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">
+                    <button type="submit" className="btn Profile-btn btn-lg w-100 rounded-pill shadow-sm">
                         保存する
                     </button>
                 </form>

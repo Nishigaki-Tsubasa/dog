@@ -24,6 +24,8 @@ import {
     FaPlus,
     FaComments,
 } from 'react-icons/fa';
+import '../styles/MatchingsRequests.css';
+
 
 const MyRequestsWithDetails = () => {
     const [myRequests, setMyRequests] = useState([]);
@@ -154,32 +156,18 @@ const MyRequestsWithDetails = () => {
 
     return (
         <div className="container mt-5" style={{ maxWidth: 700 }}>
-            <div className="d-flex align-items-center mb-4" style={{ position: 'relative' }}>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h1 className="fw-bold m-0" style={{ fontSize: '1.8rem', letterSpacing: '0.05em' }}>
+                    あなたの食事リクエスト一覧
+                </h1>
                 <button
-                    className="btn btn-primary btn-md"
+                    className="btn Requests-btn d-flex align-items-center"
                     onClick={() => navigate('/home/new-request')}
-                    style={{ minWidth: 110 }}
                 >
                     <FaPlus className="me-2" /> 新規投稿
                 </button>
-
-                <h1
-                    className="fw-bold text-center m-0"
-                    style={{
-                        position: 'absolute',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        fontSize: '1.8rem',
-                        letterSpacing: '0.05em',
-                        width: 'max-content',
-                    }}
-                >
-                    あなたの食事リクエスト一覧
-                </h1>
-
-                {/* 空のdivで右側のスペース確保（左右バランス用） */}
-                <div style={{ width: 110 }}></div>
             </div>
+
 
 
 
@@ -199,7 +187,9 @@ const MyRequestsWithDetails = () => {
                             onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                         >
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h5 className="text-primary fw-semibold mb-0">
+                                {/* 食事ジャンル/料理名 */}
+                                <h5 className="fw-semibold mb-0"
+                                    style={{ color: '#ff6f61' }}>
                                     {req.genre} {req.menu && `/ ${req.menu}`}
                                 </h5>
                                 <button
@@ -239,22 +229,27 @@ const MyRequestsWithDetails = () => {
                                     transition: 'max-height 0.4s ease',
                                 }}
                             >
-                                <h6 className="fw-bold text-primary mt-3">申請ユーザー</h6>
+                                <h6 className="fw-bold mt-3"
+                                    style={{ color: '#ff6f61' }}>申請ユーザー</h6>
                                 {req.pendingUsers.length === 0 ? (
-                                    <p className="text-muted">申請者なし</p>
+                                    <p className="text-muted"
+                                        style={{ color: '#ff6f61' }}>申請者なし</p>
                                 ) : (
                                     req.pendingUsers.map((u) => (
                                         <div
                                             key={u.uid}
-                                            className="d-flex justify-content-between align-items-center p-2 bg-light rounded mb-2 shadow-sm"
+                                            className="d-flex fw-bold justify-content-between align-items-center p-2 rounded mb-2 shadow-sm"
+                                            style={{ backgroundColor: '#fffcf1' }}
                                         >
                                             <div className="d-flex align-items-center gap-2 text-secondary">
-                                                <FaUserCircle size={20} />
+
+                                                <FaUserCircle size={20} color="#ff6f61" />
                                                 {u.username}
                                             </div>
                                             <div className="d-flex gap-1">
                                                 <button
                                                     className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+
                                                     onClick={() => navigate(`/home/profile/${u.uid}`)}
                                                     aria-label={`プロフィール確認 ${u.username}`}
                                                 >
@@ -279,9 +274,11 @@ const MyRequestsWithDetails = () => {
                                     ))
                                 )}
 
-                                <h6 className="fw-bold text-primary mt-4">参加者</h6>
+                                <h6 className="fw-bold mt-4"
+                                    style={{ color: '#ff6f61' }}>参加者</h6>
                                 {req.participantUsers.length === 0 ? (
-                                    <p className="text-muted">参加者なし</p>
+                                    <p className="text-muted"
+                                        style={{ color: '#ff6f61' }}>参加者なし</p>
                                 ) : (
                                     req.participants &&
                                     req.participants.length > 0 &&
@@ -290,10 +287,11 @@ const MyRequestsWithDetails = () => {
                                         .map((uid) => (
                                             <div
                                                 key={uid}
-                                                className="d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded shadow-sm"
+                                                className="d-flex fw-bold align-items-center justify-content-between mb-2 p-2 rounded shadow-sm"
+                                                style={{ backgroundColor: '#fffcf1', }}
                                             >
                                                 <div className="d-flex align-items-center gap-2 fw-medium text-secondary">
-                                                    <FaUserCircle size={24} color="#2980b9" />
+                                                    <FaUserCircle size={24} color="#ff6f61" />
                                                     <span>{req.participantUsers.find(u => u.uid === uid)?.username || usernamesMap[uid] || uid}</span>
                                                 </div>
 
@@ -308,7 +306,7 @@ const MyRequestsWithDetails = () => {
                                                     </button>
 
                                                     <button
-                                                        className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+                                                        className="btn Requests-btn2 btn-sm d-flex align-items-center gap-1"
                                                         onClick={() => navigate(`/home/chatStart/${uid}`)}
                                                         aria-label={`チャット開始 ${req.participantUsers.find(u => u.uid === uid)?.username || usernamesMap[uid] || uid}`}
                                                     >

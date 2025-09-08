@@ -3,6 +3,7 @@ import { collection, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebase';
 import { v4 as uuidv4 } from 'uuid';
+import '../styles/ChatRoom.css'; // ← 追加
 
 
 const generateJitsiURL = () => {
@@ -82,17 +83,20 @@ const MealRequestForm = () => {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4">オンライン食事リクエスト投稿</h2>
+            <h2 className="mb-4" style={{color:'#ff6f61'}}>オンライン食事リクエスト投稿</h2>
 
-            <form className="card p-4 shadow" onSubmit={handleSubmit}>
+            <form className="card p-4 shadow" 
+                onSubmit={handleSubmit}
+                style={{ backgroundColor: '#fdfcf7'}}
+                >
                 <div className="mb-3">
                     <label className="form-label">日付</label>
-                    <input type="date" className="form-control" name="date" onChange={handleChange} required />
+                    <input type="date" className="form-control" name="date" onChange={handleChange} required/>
                 </div>
 
                 <div className="mb-3">
                     <label className="form-label">開始時間</label>
-                    <input type="time" className="form-control" name="time" onChange={handleChange} required />
+                    <input type="time" className="form-control" name="time" onChange={handleChange} required/>
                 </div>
 
                 <div className="mb-3">
@@ -144,7 +148,7 @@ const MealRequestForm = () => {
                     <small className="form-text text-muted">※ 空欄なら制限なし</small>
                 </div>
 
-                <button type="submit" className="btn btn-primary w-100">リクエストを投稿</button>
+                <button type="submit" className="btn Chat-btn w-100">リクエストを投稿</button>
             </form>
         </div>
     );

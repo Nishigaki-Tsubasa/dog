@@ -6,6 +6,7 @@ import {
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { db } from '../../firebase/firebase';
 import { useNavigate } from 'react-router-dom';
+import '../../styles/ChatList.css'; // ← 追加
 
 const ChatList = () => {
     const [chatRooms, setChatRooms] = useState([]);
@@ -106,11 +107,11 @@ const ChatList = () => {
                             >
                                 <div className="d-flex align-items-center">
                                     <div className="me-1" style={{ width: '40px', flexShrink: 0 }}>
-                                        <i className="bi bi-person-circle fs-3 text-secondary" />
+                                        <i className="bi bi-person-circle fs-3" style={{ color: '#ff6f61' }}></i>
                                     </div>
                                     <div className="d-flex flex-column justify-content-center">
                                         <strong className="mb-1">{room.otherUserName}</strong>
-                                        <small className="text-muted">{room.lastMessage || 'メッセージなし'}</small>
+                                        <small className="text-muted last-message">{room.lastMessage || 'メッセージなし'}</small>
                                     </div>
                                 </div>
                                 <div className="text-end">

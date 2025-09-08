@@ -1,0 +1,8 @@
+/* ChatList */
+.last-message{
+white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px; /* 調整可能 */
+  display: inline-block;
+}

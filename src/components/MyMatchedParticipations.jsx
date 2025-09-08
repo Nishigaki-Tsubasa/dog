@@ -157,8 +157,9 @@ const MyMatchedParticipationsOnly = () => {
                                     <div className="d-flex align-items-center justify-content-between mb-3 p-2 bg-opacity-10 rounded shadow-sm"
                                         style={{ backgroundColor: '#fffcf1' }}>
                                         <div className="d-flex align-items-center gap-2 fw-semibold "
-                                            style={{ color: '#ff6f61' }}>
-                                            <FaUserCircle size={26} />
+                                            style={{ color: '#555' }}
+                                            >
+                                            <FaUserCircle size={26} color="#ff6f61" />
                                             <span>{usernamesMap[req.uid] || '匿名ホスト'}</span>
                                         </div>
                                         <div className="d-flex gap-2 flex-wrap">

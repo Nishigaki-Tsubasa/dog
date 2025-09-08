@@ -3,7 +3,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { useNavigate } from 'react-router-dom';
-//import '../styles/Register.css';
+import '../styles/Register.css';
 
 function Register({ setIsLoginPage }) {
     const [email, setEmail] = useState('');
@@ -43,11 +43,23 @@ function Register({ setIsLoginPage }) {
     };
 
     return (
-        <div className="container d-flex justify-content-center align-items-center bg-light" style={{ minHeight: '100vh' }}>
+        <div className="container d-flex flex-column justify-content-center align-items-center bg-light" style={{ minHeight: '100vh' }}>
+            {/* アプリ名 */}
+            <header className="mb-4 w-100 text-center">
+                <h1
+                    style={{
+                        fontSize: '90px',
+                        color: '#ff6f61',
+                        fontFamily: "'M PLUS Rounded 1c', sans-serif",
+                        userSelect: 'none',
+                    }}
+                >meeple</h1>
+            </header>
+            {/* 登録フォーム */}
             <div className="card shadow-sm border-0 p-4 rounded-4" style={{ width: '100%', maxWidth: '400px' }}>
-                <h2 className="text-center mb-4 fw-bold text-primary"
-                style={{ color: '#ff6f61', fontSize: '30px' ,userSelect: 'none' }}>
-                新規登録</h2>
+                <h2 className="text-center mb-4 fw-bold "
+                    style={{ color: '#ff6f61', fontSize: '30px', userSelect: 'none' }}>
+                    新規登録</h2>
 
                 {error && <div className="alert alert-danger">{error}</div>}
                 {success && <div className="alert alert-success">{success}</div>}
@@ -75,8 +87,7 @@ function Register({ setIsLoginPage }) {
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary btn-lg w-100 rounded-pill shadow-sm"
-                        style={{ backgroundColor: '#ff6f61', color: '#FFFFFF', border: 'none' }}>
+                    <button type="submit" className="btn Login-btn2 btn-lg w-100 rounded-pill shadow-sm">
                         登録する
                     </button>
                 </form>

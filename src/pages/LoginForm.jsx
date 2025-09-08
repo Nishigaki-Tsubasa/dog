@@ -4,6 +4,7 @@ import { auth, db } from '../firebase/firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import '../colors.js';
+import '../styles/LoginForm.css'; // スタイルシートのインポート
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -56,10 +57,9 @@ function Login() {
 
     return (
         // 全体
-        <div className="container d-flex flex-column justify-content-center align-items-center "
+        <div className="container d-flex flex-column justify-content-center align-items-center bg-light"
             style={{
                 minHeight: '100vh',
-                backgroundColor: '#fdfcf7',
             }}>
             {/* アプリ名 */}
             <header className="mb-4 w-100 text-center">
@@ -67,7 +67,7 @@ function Login() {
                     style={{
                         fontSize: '90px',
                         color: '#ff6f61',
-                        fontFamily: "'M PLUS Rounded 1c', sans-serif", 
+                        fontFamily: "'M PLUS Rounded 1c', sans-serif",
                         userSelect: 'none',
                     }}
                 >meeple</h1>
@@ -76,10 +76,9 @@ function Login() {
             <div className="card p-4 shadow rounded-4 w-100" style={{ maxWidth: '400px' }}>
                 <h2 className="text-center mb-4 fw-bold"
                     style={{
-                        color: '#ff6f61',
-                        fontSize: '30px',
-                        userSelect: 'none',
-                    }}>ログイン</h2>
+                        color: '#ff6f61', fontSize: '35px', userSelect: 'none',
+                    }}>
+                    ログイン</h2>
 
                 {error && <div className="alert alert-danger">{error}</div>}
 
@@ -109,13 +108,7 @@ function Login() {
                     </div>
 
                     <div className="d-grid">
-                        <button type="submit" className="btn btn-success btn-lg rounded-pill shadow-sm"
-                            style={{
-                                backgroundColor: '#ff6f61',
-                                color: 'white',
-                                border: 'none'
-                            }}
-                        >
+                        <button type="submit" className="btn Login-btn2 btn-success btn-lg rounded-pill shadow-sm">
                             ログイン
                         </button>
                     </div>

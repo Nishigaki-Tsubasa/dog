@@ -1,0 +1,29 @@
+/* ボタン：新規登録 */
+.Register-btn {
+  background-color: #ff6f61 !important;
+  color: #ffffff            !important;
+  border: 1px solid #ff6f61 !important;
+  font-weight: bold           !important;
+  width: 100%                 !important;
+  border-radius: 50rem        !important; /* rounded-pill と同等 */
+  transition: background-color 0.3s, border-color 0.3s !important; /*遷移効果*/
+}
+.Register-btn:hover { /*ホバースタイル*/
+  background-color: #eb4233 !important; /* 濃いめのホバー色 */
+  border-color: #e85a4d     !important;
+  color: #ffffff            !important; /* 必要なら変えてもOK */
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1) !important; /* ホバー時の影効果 */
+}
+.Login-btn2 {
+    background-color: #ffffff !important;
+    border-color: #ff6f61     !important;
+    color: #ff6f61            !important;
+    font-weight: bold           !important;
+}
+.Login-btn2:hover {
+    background-color: #ff6f61 !important;
+    color: #ffffff            !important;
+    border-color: #ff6f61     !important;
+    font-weight: bold           !important;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1) !important; /* ホバー時の影効果 */
+}

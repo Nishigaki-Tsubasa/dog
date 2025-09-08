@@ -69,18 +69,19 @@ const MealList = () => {
         if (request.pendingRequests?.includes(userId)) return '承認待ち';
         return '申請可能';
     };
-
+    // 参加申し込み画面
     return (
         <div className="container py-5" style={{ maxWidth: 900 }}>
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold display-6 m-0">食事の一覧</h2>
-                    <button
-                        className="btn MealList-btn d-flex align-items-center"
-                        onClick={() => navigate('/home/new-request')}
-                        style={{ minWidth: 140 , justifyContent: 'center' }}
-                    >
-                        <FaPlus /> 新規投稿
-                    </button>
+                <h2 className="fw-bold display-6 m-0" style={{ fontSize: '1.8rem',letterSpacing: '0.05em'}}>
+                    食事の一覧
+                </h2>
+                <button
+                    className="btn MealList-btn d-flex align-items-center"
+                    onClick={() => navigate('/home/new-request')}
+                >
+                    <FaPlus className="me-2" /> 新規投稿
+                </button>
             </div>
 
             {requests.length === 0 ? (
@@ -103,7 +104,7 @@ const MealList = () => {
                                                 className="MealList-Name card-title fw-bold mb-3"
                                                 role="button"
                                                 onClick={() => navigate(`/home/profile/${req.uid}`)}
-                                                style={{ cursor: 'pointer', userSelect: 'none',}}
+                                                style={{ cursor: 'pointer', userSelect: 'none', }}
                                                 onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
                                                 onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
                                             >

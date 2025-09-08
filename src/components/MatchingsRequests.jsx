@@ -26,7 +26,6 @@ import {
 } from 'react-icons/fa';
 import '../styles/MatchingsRequests.css';
 
-
 const MyRequestsWithDetails = () => {
     const [myRequests, setMyRequests] = useState([]);
     const [expandedId, setExpandedId] = useState(null);
@@ -41,9 +40,15 @@ const MyRequestsWithDetails = () => {
             const q = query(collection(db, 'mealRequests'), where('uid', '==', user.uid));
             const querySnapshot = await getDocs(q);
             const requestsData = [];
+            const now = new Date(); // 現在時刻
 
             for (const docSnap of querySnapshot.docs) {
                 const data = docSnap.data();
+                const startDate = data.startTime?.toDate();
+
+                // 未来の予定だけ残す
+                if (!startDate || startDate <= now) continue;
+
                 const pendingUIDs = data.pendingRequests || [];
                 const participantsUIDs = data.participants || [];
 
@@ -77,7 +82,12 @@ const MyRequestsWithDetails = () => {
                 });
             }
 
-            setMyRequests(requestsData);
+            // 日付が近い順にソート
+            const sortedRequests = requestsData.sort(
+                (a, b) => a.startTime.toDate() - b.startTime.toDate()
+            );
+
+            setMyRequests(sortedRequests);
         };
 
         fetchMyRequests();
@@ -168,9 +178,6 @@ const MyRequestsWithDetails = () => {
                 </button>
             </div>
 
-
-
-
             {myRequests.length === 0 ? (
                 <p className="text-muted text-center">リクエストはまだありません。</p>
             ) : (
@@ -186,155 +193,97 @@ const MyRequestsWithDetails = () => {
                             onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.02)')}
                             onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                         >
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                {/* 食事ジャンル/料理名 */}
-                                <h5 className="fw-semibold mb-0"
-                                    style={{ color: '#ff6f61' }}>
-                                    {req.genre} {req.menu && `/ ${req.menu}`}
-                                </h5>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 className="fw-bold">{req.genre} / {req.menu}</h5>
+                                    <p className="mb-1 text-muted">
+                                        日時: {start.toLocaleString('ja-JP')}
+                                    </p>
+                                    <p className="mb-0 text-muted">時間: {duration}分</p>
+                                </div>
                                 <button
-                                    className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                                    className="btn btn-sm btn-outline-secondary"
                                     onClick={() => toggleExpand(req.id)}
                                 >
-                                    {expandedId === req.id ? (
-                                        <>
-                                            <FaChevronUp /> 閉じる
-                                        </>
-                                    ) : (
-                                        <>
-                                            <FaChevronDown /> 詳細
-                                        </>
-                                    )}
+                                    {expandedId === req.id ? <FaChevronUp /> : <FaChevronDown />}
                                 </button>
                             </div>
 
-                            <p className="text-secondary small mb-3">
-                                <strong>日時:</strong> {start.toLocaleString([], {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    hour12: false
-                                })}（{duration}分）
-
-                                <br />
-                                <strong>上限:</strong> {req.participantsLimit || 'なし'}人
-                            </p>
-
-                            <div
-                                style={{
-                                    maxHeight: expandedId === req.id ? '1000px' : 0,
-                                    overflow: 'hidden',
-                                    transition: 'max-height 0.4s ease',
-                                }}
-                            >
-                                <h6 className="fw-bold mt-3"
-                                    style={{ color: '#ff6f61' }}>申請ユーザー</h6>
-                                {req.pendingUsers.length === 0 ? (
-                                    <p className="text-muted"
-                                        style={{ color: '#ff6f61' }}>申請者なし</p>
-                                ) : (
-                                    req.pendingUsers.map((u) => (
-                                        <div
-                                            key={u.uid}
-                                            className="d-flex fw-bold justify-content-between align-items-center p-2 rounded mb-2 shadow-sm"
-                                            style={{ backgroundColor: '#fffcf1' }}
-                                        >
-                                            <div className="d-flex align-items-center gap-2 text-secondary">
-
-                                                <FaUserCircle size={20} color="#ff6f61" />
-                                                {u.username}
-                                            </div>
-                                            <div className="d-flex gap-1">
-                                                <button
-                                                    className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
-
-                                                    onClick={() => navigate(`/home/profile/${u.uid}`)}
-                                                    aria-label={`プロフィール確認 ${u.username}`}
-                                                >
-                                                    <FaUserCircle />
-                                                    <span className="btn-text">プロフィール</span>
-                                                </button>
-
-                                                <button
-                                                    className="btn btn-success btn-sm"
-                                                    onClick={() => handleApproval(req.id, u.uid, true)}
-                                                >
-                                                    <FaCheck />
-                                                </button>
-                                                <button
-                                                    className="btn btn-danger btn-sm"
-                                                    onClick={() => handleApproval(req.id, u.uid, false)}
-                                                >
-                                                    <FaTimes />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-
-                                <h6 className="fw-bold mt-4"
-                                    style={{ color: '#ff6f61' }}>参加者</h6>
-                                {req.participantUsers.length === 0 ? (
-                                    <p className="text-muted"
-                                        style={{ color: '#ff6f61' }}>参加者なし</p>
-                                ) : (
-                                    req.participants &&
-                                    req.participants.length > 0 &&
-                                    req.participants
-                                        .filter((uid) => uid !== user.uid)
-                                        .map((uid) => (
+                            {expandedId === req.id && (
+                                <div className="mt-3">
+                                    {/* 申請ユーザー一覧 */}
+                                    <h6>申請中のユーザー</h6>
+                                    {req.pendingUsers.length === 0 ? (
+                                        <p className="text-muted">申請はありません。</p>
+                                    ) : (
+                                        req.pendingUsers.map((u) => (
                                             <div
-                                                key={uid}
-                                                className="d-flex fw-bold align-items-center justify-content-between mb-2 p-2 rounded shadow-sm"
-                                                style={{ backgroundColor: '#fffcf1', }}
+                                                key={u.uid}
+                                                className="d-flex justify-content-between align-items-center mb-2"
                                             >
-                                                <div className="d-flex align-items-center gap-2 fw-medium text-secondary">
-                                                    <FaUserCircle size={24} color="#ff6f61" />
-                                                    <span>{req.participantUsers.find(u => u.uid === uid)?.username || usernamesMap[uid] || uid}</span>
+                                                <div className="d-flex align-items-center">
+                                                    <FaUserCircle className="me-2" />
+                                                    {u.username}
                                                 </div>
-
-                                                <div className="d-flex gap-2 flex-wrap">
+                                                <div>
                                                     <button
-                                                        className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
-                                                        onClick={() => navigate(`/home/profile/${uid}`)}
-                                                        aria-label={`プロフィール確認 ${req.participantUsers.find(u => u.uid === uid)?.username || usernamesMap[uid] || uid}`}
+                                                        className="btn btn-sm btn-success me-2"
+                                                        onClick={() => handleApproval(req.id, u.uid, true)}
                                                     >
-                                                        <FaUserCircle />
-                                                        <span className="btn-text">プロフィール</span>
+                                                        <FaCheck />
                                                     </button>
-
                                                     <button
-                                                        className="btn Requests-btn2 btn-sm d-flex align-items-center gap-1"
-                                                        onClick={() => navigate(`/home/chatStart/${uid}`)}
-                                                        aria-label={`チャット開始 ${req.participantUsers.find(u => u.uid === uid)?.username || usernamesMap[uid] || uid}`}
+                                                        className="btn btn-sm btn-danger"
+                                                        onClick={() => handleApproval(req.id, u.uid, false)}
                                                     >
-                                                        <FaComments />
-                                                        <span className="btn-text">チャット</span>
-                                                    </button>
-
-                                                    <button
-                                                        className="btn btn-outline-danger btn-sm d-flex align-items-center gap-1"
-                                                        onClick={() => handleRemoveParticipant(req.id, uid)}
-                                                    >
-                                                        <FaTrash />
-                                                        <span className="btn-text">削除</span>
+                                                        <FaTimes />
                                                     </button>
                                                 </div>
                                             </div>
                                         ))
-                                )}
+                                    )}
 
-                                <div className="text-end mt-4">
-                                    <button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={() => handleDeleteRequest(req.id)}
-                                    >
-                                        <FaTrash className="me-1" /> 投稿を削除する
-                                    </button>
+                                    {/* 参加者一覧 */}
+                                    <h6 className="mt-3">参加者</h6>
+                                    {req.participantUsers.length === 0 ? (
+                                        <p className="text-muted">まだ参加者はいません。</p>
+                                    ) : (
+                                        req.participantUsers.map((u) => (
+                                            <div
+                                                key={u.uid}
+                                                className="d-flex justify-content-between align-items-center mb-2"
+                                            >
+                                                <div className="d-flex align-items-center">
+                                                    <FaUserCircle className="me-2" />
+                                                    {u.username}
+                                                </div>
+                                                <button
+                                                    className="btn btn-sm btn-outline-danger"
+                                                    onClick={() => handleRemoveParticipant(req.id, u.uid)}
+                                                >
+                                                    <FaTrash />
+                                                </button>
+                                            </div>
+                                        ))
+                                    )}
+
+                                    {/* チャット・削除 */}
+                                    <div className="mt-3 d-flex gap-2">
+                                        <button
+                                            className="btn btn-outline-primary flex-grow-1"
+                                            onClick={() => navigate(`/home/chat/${req.id}`)}
+                                        >
+                                            <FaComments className="me-2" /> チャット
+                                        </button>
+                                        <button
+                                            className="btn btn-outline-danger flex-grow-1"
+                                            onClick={() => handleDeleteRequest(req.id)}
+                                        >
+                                            <FaTrash className="me-2" /> リクエスト削除
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     );
                 })

@@ -18,13 +18,16 @@ const HomeComponents = () => {
 
         const fetchData = async () => {
             try {
+                // 現在ログイン中のユーザーデータ取得
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 if (userDoc.exists()) {
                     setCurrentUserData(userDoc.data());
                 }
 
+                // mealRequests コレクション取得
                 const mealSnap = await getDocs(collection(db, 'mealRequests'));
                 const list = [];
+                const now = new Date(); // 現在時刻
 
                 for (const docSnap of mealSnap.docs) {
                     const data = docSnap.data();
@@ -35,15 +38,24 @@ const HomeComponents = () => {
                             hostName = hostDoc.data().username || '不明';
                         }
 
-                        list.push({
-                            id: docSnap.id,
-                            ...data,
-                            hostName,
-                        });
+                        // 開始時刻が未来のデータのみ追加
+                        const startDate = data.startTime?.toDate();
+                        if (startDate && startDate > now) {
+                            list.push({
+                                id: docSnap.id,
+                                ...data,
+                                hostName,
+                            });
+                        }
                     }
                 }
 
-                setMealRequests(list);
+                // 開始時刻が近い順に並べ替え、最大4件に制限
+                const upcomingMeals = list
+                    .sort((a, b) => a.startTime.toDate() - b.startTime.toDate())
+                    .slice(0, 4);
+
+                setMealRequests(upcomingMeals);
             } catch (error) {
                 console.error('データ取得エラー:', error);
             }
@@ -91,37 +103,18 @@ const HomeComponents = () => {
                                     </h6>
                                     <hr />
                                     <p className="card-text mb-2">
-                                        <strong>日時:</strong> {meal.startTime.toDate().toLocaleString('ja-JP', {
+                                        <strong>日時:</strong>{' '}
+                                        {meal.startTime.toDate().toLocaleString('ja-JP', {
                                             year: 'numeric',
                                             month: '2-digit',
                                             day: '2-digit',
                                             hour: '2-digit',
                                             minute: '2-digit',
-                                            second: undefined, // 秒を非表示に
                                         })}<br />
-                                        <strong>時間:</strong> {Math.round(meal.durationHours * 60)}分<br />
+                                        <strong>時間:</strong>{' '}
+                                        {Math.round(meal.durationHours * 60)}分<br />
                                     </p>
-                                    {/* <div className="d-flex gap-2 mb-3">
-                                        <div className="d-flex gap-2 mb-3">
-                                            <a
-                                                href={meal.location}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="btn btn-outline-primary flex-grow-1"
-                                                style={{ textDecoration: 'none' }}
-                                            >
-                                                ビデオ通話
-                                            </a>
-                                            <button
-                                                className="btn btn-outline-primary flex-grow-1"
-                                                onClick={() => navigate(`/home/chat/`)}
-                                            >
-                                                チャット
-                                            </button>
-                                        </div>
-
-                                    </div> */}
-
+                                    {/* 必要ならチャットやビデオ通話ボタンをここに復活 */}
                                 </div>
                             </div>
                         </div>

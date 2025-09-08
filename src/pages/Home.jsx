@@ -177,7 +177,7 @@ function Home() {
                     <Route path="/jitsi/:roomId" element={<JitsiMeet />} />
                     <Route path="/notifications" element={<Notifications />} />
                     <Route path="/hogehoge" element={<RandomJapaneseMenu />} />
-                    <Route path="EditProfile" element={<EditProfile />} />
+                    <Route path="/EditProfile" element={<EditProfile />} />
                 </Routes>
             </main>
         </div>

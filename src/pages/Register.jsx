@@ -37,6 +37,7 @@ function Register({ setIsLoginPage }) {
             setSuccess('登録に成功しました！');
             setEmail('');
             setPassword('');
+            navigate('/profile');
         } catch (err) {
             setError('登録に失敗しました: ' + err.message);
         }

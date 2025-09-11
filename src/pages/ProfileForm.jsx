@@ -35,7 +35,8 @@ function ProfileForm() {
             firstcreated: false,
         }, { merge: true });
 
-        navigate('/home');
+
+        navigate('/home/*');
     };
 
     return (

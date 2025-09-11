@@ -15,18 +15,12 @@ import UserProfilePage from '../components/UserProfilePage';
 import ChatList from '../components/chatComponets/ChatList';
 import ChatRoom from '../components/chatComponets/ChatRoom';
 import ChatStart from '../components/chatComponets/ChatStart';
-import OffcanvasSidebar from '../components/OffcanvasSidebar';
 import JitsiMeet from '../components/JitsiMeet';
-import NotificationIcon from '../components/NotificationIcon';
 import Notifications from '../components/Notifications';
 import RandomJapaneseMenu from '../components/RandomJapaneseMenu';
 
 import colors from '../colors';
 import '../styles/Home.css';
-
-const Placeholder = ({ title }) => (
-    <div className="fs-4 text-secondary">{title}画面 - 準備中...</div>
-);
 
 function Home() {
     const navigate = useNavigate();
@@ -34,6 +28,7 @@ function Home() {
     const [username, setUsername] = useState(null);
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [hovered, setHovered] = useState(false);
 
     const sidebarWidthOpen = 250;
     const sidebarWidthClosed = 70;
@@ -59,7 +54,6 @@ function Home() {
             }
             setLoading(false);
         });
-
         return () => unsubscribe();
     }, []);
 
@@ -79,7 +73,6 @@ function Home() {
         { to: '/home/matching', icon: 'bi-people', label: 'マッチング済み' },
         { to: '/home/chat', icon: 'bi-chat-dots', label: 'チャット' },
         { to: '/home/hogehoge', icon: 'bi-calendar', label: 'メニュー' },
-        //{ to: '/home/EditProfile', icon: 'bi-person', label: 'プロフィール編集' },
     ];
 
     return (
@@ -87,33 +80,93 @@ function Home() {
             className="d-flex"
             style={{ minHeight: '100vh', backgroundColor: colors.mainBg, color: colors.text }}
         >
+            {/* サイドバー */}
             <nav
-                className="sidebar d-flex flex-column align-items-center align-items-md-start px-2 py-3 border-end"
+                className="sidebar d-flex flex-column align-items-center px-2 py-3 border-end"
                 style={{
                     width: sidebarOpen ? sidebarWidthOpen : sidebarWidthClosed,
                     backgroundColor: colors.subBg,
                     transition: 'width 0.3s',
                 }}
             >
-                <div className={`d-flex w-100 mb-2 ${sidebarOpen ? 'justify-content-end' : 'justify-content-center'}`}>
-                    <button
-                        className="my-btn"
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
-                    >
-                        <i className={`bi ${sidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
-                    </button>
+                {/* 上部：アイコン & 開閉ボタン */}
+                <div className="d-flex w-100 mb-3 align-items-center">
+                    {sidebarOpen ? (
+                        // 開いているとき：左端にアイコン、右端に閉じるボタン
+                        <>
+                            <img
+                                src="/favicon.ico"
+                                alt="App Icon"
+                                style={{
+                                    width: "40px",
+                                    height: "40px",
+                                    objectFit: "cover",
+                                    marginLeft: "8px",
+                                }}
+                            />
+                            <div className="flex-grow-1"></div> {/* 両端配置用の空きスペース */}
+                            <button
+                                className="my-btn"
+                                onClick={() => setSidebarOpen(false)}
+                                style={{
+                                    width: "40px",
+                                    height: "40px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    marginRight: "8px",
+                                }}
+                            >
+                                <i className="bi bi-chevron-left"></i>
+                            </button>
+                        </>
+                    ) : (
+                        // 閉じているとき：中央にアイコンのみ → hoverで開くボタンに変化
+                        <div
+                            style={{
+                                width: "40px",
+                                height: "40px",
+                                margin: "0 auto",
+                            }}
+                            onMouseEnter={() => setHovered(true)}
+                            onMouseLeave={() => setHovered(false)}
+                        >
+                            {!hovered ? (
+                                <img
+                                    src="/favicon.ico"
+                                    alt="App Icon"
+                                    style={{
+                                        width: "40px",
+                                        height: "40px",
+                                        objectFit: "cover",
+                                        cursor: "pointer",
+                                    }}
+                                />
+                            ) : (
+                                <button
+                                    className="my-btn"
+                                    style={{
+                                        width: "40px",
+                                        height: "40px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    }}
+                                    onClick={() => setSidebarOpen(true)}
+                                >
+                                    <i className="bi bi-chevron-right"></i>
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
 
-
-                <div
-                    className="card mb-4 w-100"
-                    style={{ backgroundColor: colors.mainBg, border: 'none' }}
-                >
-                    {/* クリック可能なエリア */}
+                {/* プロフィール部分 */}
+                <div className="card mb-4 w-100" style={{ backgroundColor: colors.mainBg, border: 'none' }}>
                     <div
                         className="card-body d-flex align-items-center"
                         onClick={() => navigate('/home/EditProfile')}
-                        style={{ cursor: 'pointer' }} // マウスカーソルが手の形になる
+                        style={{ cursor: 'pointer' }}
                     >
                         <i
                             className="bi bi-person-circle fs-3 me-2"
@@ -124,15 +177,16 @@ function Home() {
                                 <div className="small text-muted" style={{ userSelect: 'none' }}>ようこそ、</div>
                                 <div
                                     className="fw-bold text-dark text-truncate"
-                                    style={{ maxWidth: '150px', userSelect: 'none', }}
+                                    style={{ maxWidth: '150px', userSelect: 'none' }}
                                 >
-                                    {username ?? '名無し'}
+                                    {username ?? '未設定'}
                                 </div>
                             </div>
                         )}
                     </div>
                 </div>
 
+                {/* メニュー */}
                 <ul className="nav nav-pills flex-column w-100">
                     {menuItems.map(({ to, icon, label }) => (
                         <li key={to} className="nav-item">
@@ -150,6 +204,7 @@ function Home() {
                     ))}
                 </ul>
 
+                {/* ログアウトボタン */}
                 <button
                     onClick={handleLogout}
                     className="btn btn-danger w-100 mt-auto d-flex align-items-center justify-content-center"
@@ -159,10 +214,8 @@ function Home() {
                 </button>
             </nav>
 
-            <main
-                className="flex-grow-1 px-3 py-4"
-                style={{ transition: 'margin 0.3s' }}
-            >
+            {/* メインコンテンツ */}
+            <main className="flex-grow-1 px-3 py-4" style={{ transition: 'margin 0.3s' }}>
                 <Routes>
                     <Route path="*" element={<HomeComponents />} />
                     <Route path="new-request" element={<MealRegistrationForm />} />

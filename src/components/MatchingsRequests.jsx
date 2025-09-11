@@ -3,13 +3,13 @@ import {
     collection,
     query,
     where,
-    getDocs,
     doc,
     getDoc,
     updateDoc,
     arrayRemove,
     deleteDoc,
     arrayUnion,
+    onSnapshot,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebase';
@@ -36,23 +36,21 @@ const MyRequestsWithDetails = () => {
     useEffect(() => {
         if (!user) return;
 
-        const fetchMyRequests = async () => {
-            const q = query(collection(db, 'mealRequests'), where('uid', '==', user.uid));
-            const querySnapshot = await getDocs(q);
+        const q = query(collection(db, 'mealRequests'), where('uid', '==', user.uid));
+
+        const unsubscribe = onSnapshot(q, async (querySnapshot) => {
             const requestsData = [];
-            const now = new Date(); // 現在時刻
+            const now = new Date();
 
             for (const docSnap of querySnapshot.docs) {
                 const data = docSnap.data();
                 const startDate = data.startTime?.toDate();
-
-                // 未来の予定だけ残す
                 if (!startDate || startDate <= now) continue;
 
                 const pendingUIDs = data.pendingRequests || [];
                 const participantsUIDs = data.participants || [];
 
-                // 申請ユーザー情報取得
+                // 申請ユーザー情報
                 const pendingUsers = await Promise.all(
                     pendingUIDs.map(async (uid) => {
                         const userDoc = await getDoc(doc(db, 'users', uid));
@@ -63,7 +61,7 @@ const MyRequestsWithDetails = () => {
                     })
                 );
 
-                // 参加者ユーザー情報取得
+                // 参加者ユーザー情報
                 const participantUsers = await Promise.all(
                     participantsUIDs.map(async (uid) => {
                         const userDoc = await getDoc(doc(db, 'users', uid));
@@ -82,15 +80,15 @@ const MyRequestsWithDetails = () => {
                 });
             }
 
-            // 日付が近い順にソート
+            // 日付順にソート
             const sortedRequests = requestsData.sort(
                 (a, b) => a.startTime.toDate() - b.startTime.toDate()
             );
 
             setMyRequests(sortedRequests);
-        };
+        });
 
-        fetchMyRequests();
+        return () => unsubscribe();
     }, [user]);
 
     const toggleExpand = (id) => {
@@ -104,46 +102,15 @@ const MyRequestsWithDetails = () => {
             ...(approve && { participants: arrayUnion(uid) }),
             pendingRequests: arrayRemove(uid),
         });
-
-        setMyRequests((prev) =>
-            prev.map((req) => {
-                if (req.id !== requestId) return req;
-
-                const newPending = req.pendingUsers.filter((u) => u.uid !== uid);
-                const newParticipants = approve
-                    ? [...(req.participantUsers || []), { uid, username: '参加者' }]
-                    : req.participantUsers;
-
-                return {
-                    ...req,
-                    pendingUsers: newPending,
-                    participantUsers: newParticipants,
-                };
-            })
-        );
     };
 
     const handleRemoveParticipant = async (requestId, uid) => {
-        if (!window.confirm('この参加者をリクエストから削除しますか？')) return;
-
         try {
             const requestRef = doc(db, 'mealRequests', requestId);
 
             await updateDoc(requestRef, {
                 participants: arrayRemove(uid),
             });
-
-            setMyRequests((prev) =>
-                prev.map((req) =>
-                    req.id === requestId
-                        ? {
-                            ...req,
-                            participantUsers: req.participantUsers.filter((u) => u.uid !== uid),
-                            participants: req.participants.filter((id) => id !== uid),
-                        }
-                        : req
-                )
-            );
         } catch (error) {
             console.error('削除失敗:', error);
             alert('削除に失敗しました。');
@@ -155,7 +122,6 @@ const MyRequestsWithDetails = () => {
 
         try {
             await deleteDoc(doc(db, 'mealRequests', requestId));
-            setMyRequests((prev) => prev.filter((req) => req.id !== requestId));
         } catch (error) {
             alert('削除に失敗しました');
             console.error(error);
@@ -269,12 +235,12 @@ const MyRequestsWithDetails = () => {
 
                                     {/* チャット・削除 */}
                                     <div className="mt-3 d-flex gap-2">
-                                        <button
+                                        {/* <button
                                             className="btn btn-outline-primary flex-grow-1"
                                             onClick={() => navigate(`/home/chat/${req.id}`)}
                                         >
                                             <FaComments className="me-2" /> チャット
-                                        </button>
+                                        </button> */}
                                         <button
                                             className="btn btn-outline-danger flex-grow-1"
                                             onClick={() => handleDeleteRequest(req.id)}

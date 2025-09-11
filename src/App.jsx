@@ -9,6 +9,7 @@ import Login from './pages/LoginForm.jsx';
 import Register from './pages/Register';
 import ProfileForm from './pages/ProfileForm';
 import Home from './pages/Home';
+import { AlignStart } from 'react-bootstrap-icons';
 
 // ローディングコンポーネント
 function Loading() {
@@ -61,21 +62,16 @@ function App() {
   }, [user, location.pathname]);
 
   // リダイレクト処理
-  useEffect(() => {
-    if (!user || userData === null || hasRedirected) return;
+  // useEffect(() => {
+  //   if (!user || userData === null || hasRedirected) return;
 
-    if (userData.firstcreated) {
-      if (location.pathname !== '/profile') {
-        setHasRedirected(true);
-        navigate('/profile');
-      }
-    } else {
-      if (!location.pathname.startsWith('/home')) {
-        setHasRedirected(true);
-        navigate('/home');
-      }
-    }
-  }, [user, userData, location.pathname, hasRedirected]);
+
+  //   if (!location.pathname.startsWith('/home')) {
+  //     setHasRedirected(true);
+  //     navigate('/home');
+  //   }
+
+  // }, [user, userData, location.pathname, hasRedirected]);
 
   // ローディング中なら表示
   if (isLoading) return <Loading />;

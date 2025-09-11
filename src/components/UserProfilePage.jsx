@@ -20,6 +20,7 @@ const UserProfilePage = () => {
         };
         fetchProfile();
     }, [uid]);
+
     const genderDisplay = (gender) => {
         switch (gender) {
             case 'man':
@@ -37,6 +38,13 @@ const UserProfilePage = () => {
             default:
                 return gender;
         }
+    };
+
+    const formatFoodList = (foodField) => {
+        if (!foodField) return '未設定';
+        if (Array.isArray(foodField)) return foodField.join(', ');
+        // 文字列の場合、カンマで分割してトリム
+        return foodField.split(',').map(s => s.trim()).join(', ');
     };
 
     if (!profile) {
@@ -72,15 +80,11 @@ const UserProfilePage = () => {
                 </li>
                 <li className="list-group-item">
                     <strong>好きな食べ物:</strong>{' '}
-                    {Array.isArray(profile.favoriteFoods)
-                        ? profile.favoriteFoods.join(', ')
-                        : '未設定'}
+                    {formatFoodList(profile.favoriteFoods)}
                 </li>
                 <li className="list-group-item">
                     <strong>苦手な食べ物:</strong>{' '}
-                    {Array.isArray(profile.dislikedFoods)
-                        ? profile.dislikedFoods.join(', ')
-                        : '未設定'}
+                    {formatFoodList(profile.dislikedFoods)}
                 </li>
                 <li className="list-group-item">
                     <strong>自己紹介:</strong>

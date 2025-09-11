@@ -63,6 +63,12 @@ function Login() {
             }}>
             {/* アプリ名 */}
             <header className="mb-4 w-100 text-center">
+
+                {/* <img src="/favicon.ico" style={{
+                    idth: '35px',
+                    height: '35px',
+                    objectFit: 'cover',
+                }} alt="" /> */}
                 <h1
                     style={{
                         fontSize: '90px',
@@ -149,6 +155,23 @@ function Login() {
                         >
                             新規登録
                         </span>
+                    </small>
+                    <small className="text-center">
+                        アプリの使い方{' '}
+                        <a
+                            href="https://v0-remix-of-meeple-app-documentati.vercel.app/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                color: '#ff9e5e',
+                                textDecoration: 'underline',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            こちら
+                        </a>
+
+
                     </small>
                 </div>
 

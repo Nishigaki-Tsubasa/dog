@@ -73,30 +73,30 @@ const MealRequestForm = () => {
                 participantsLimit: '',
             });
 
-            alert('食事リクエストを投稿しました！');
+            //alert('食事リクエストを投稿しました！');
             window.location.href = '/home/matchingsRequests';
         } catch (error) {
-            alert('投稿に失敗しました。もう一度お試しください。');
+            //alert('投稿に失敗しました。もう一度お試しください。');
             console.error(error);
         }
     };
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4" style={{color:'#ff6f61'}}>オンライン食事リクエスト投稿</h2>
+            <h2 className="mb-4" style={{ color: '#ff6f61' }}>オンライン食事リクエスト投稿</h2>
 
-            <form className="card p-4 shadow" 
+            <form className="card p-4 shadow"
                 onSubmit={handleSubmit}
-                style={{ backgroundColor: '#fdfcf7'}}
-                >
+                style={{ backgroundColor: '#fdfcf7' }}
+            >
                 <div className="mb-3">
                     <label className="form-label">日付</label>
-                    <input type="date" className="form-control" name="date" onChange={handleChange} required/>
+                    <input type="date" className="form-control" name="date" onChange={handleChange} required />
                 </div>
 
                 <div className="mb-3">
                     <label className="form-label">開始時間</label>
-                    <input type="time" className="form-control" name="time" onChange={handleChange} required/>
+                    <input type="time" className="form-control" name="time" onChange={handleChange} required />
                 </div>
 
                 <div className="mb-3">

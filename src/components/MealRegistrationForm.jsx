@@ -3,15 +3,11 @@ import { collection, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase/firebase';
 import { v4 as uuidv4 } from 'uuid';
-import '../styles/ChatRoom.css'; // ← 追加
-
 
 const generateJitsiURL = () => {
     const randomString = Math.random().toString(36).substring(2, 10);
     return `https://meet.jit.si/mealmatch-${randomString}`;
 };
-
-
 
 const MealRequestForm = () => {
     const [form, setForm] = useState({
@@ -22,6 +18,7 @@ const MealRequestForm = () => {
         menu: '',
         participantsLimit: '',
     });
+    const [loading, setLoading] = useState(false);
 
     const handleChange = e => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -29,25 +26,31 @@ const MealRequestForm = () => {
 
     const handleSubmit = async e => {
         e.preventDefault();
+        if (loading) return;
+        setLoading(true);
+
         const auth = getAuth();
         const user = auth.currentUser;
-        if (!user) return alert('ログインが必要です');
-
-        // Firestoreからユーザーのusernameを取得
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        const username = userDocSnap.exists() ? userDocSnap.data().username : '匿名';
-
-        const [year, month, day] = form.date.split('-');
-        const [hour, minute] = form.time.split(':');
-        const startTime = new Date(year, month - 1, day, hour, minute);
-
-        const durationHours = Number(form.durationMinutes) / 60;
-        const participantsLimit = form.participantsLimit ? Number(form.participantsLimit) : null;
-        const jitsiURL = generateJitsiURL();
-        const roomId = uuidv4(); // ランダムなルームIDを生成
+        if (!user) {
+            alert('ログインが必要です');
+            setLoading(false);
+            return;
+        }
 
         try {
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+            const username = userDocSnap.exists() ? userDocSnap.data().username : '匿名';
+
+            const [year, month, day] = form.date.split('-');
+            const [hour, minute] = form.time.split(':');
+            const startTime = new Date(year, month - 1, day, hour, minute);
+
+            const durationHours = Number(form.durationMinutes) / 60;
+            const participantsLimit = form.participantsLimit ? Number(form.participantsLimit) : null;
+            const jitsiURL = generateJitsiURL();
+            const roomId = uuidv4();
+
             await addDoc(collection(db, 'mealRequests'), {
                 uid: user.uid,
                 username,
@@ -73,30 +76,100 @@ const MealRequestForm = () => {
                 participantsLimit: '',
             });
 
-            //alert('食事リクエストを投稿しました！');
             window.location.href = '/home/matchingsRequests';
         } catch (error) {
-            //alert('投稿に失敗しました。もう一度お試しください。');
             console.error(error);
+            alert('投稿に失敗しました。もう一度お試しください。');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4" style={{ color: '#ff6f61' }}>オンライン食事リクエスト投稿</h2>
+            <style>{`
+                /* タイトル */
+                .form-title {
+                    font-size: clamp(1.5rem, 4vw, 2rem);
+                    text-align: center;
+                    margin-bottom: 1.5rem;
+                }
 
-            <form className="card p-4 shadow"
-                onSubmit={handleSubmit}
-                style={{ backgroundColor: '#fdfcf7' }}
-            >
+                /* カードフォーム */
+                .meal-form {
+                    background-color: #fdfcf7;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 2rem;
+                    border-radius: 1rem;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                    font-size: clamp(0.9rem, 2vw, 1rem);
+                }
+
+                .meal-form .form-label {
+                    font-weight: 500;
+                }
+
+                .meal-form .form-text {
+                    font-size: 0.85rem;
+                    color: #555;
+                }
+
+                /* ボタン */
+                .Chat-btn {
+                    background-color: #ff6f61;
+                    color: white;
+                    font-weight: bold;
+                    font-size: clamp(1rem, 2vw, 1.1rem);
+                    padding: 0.5rem 1rem;
+                    border: none;
+                    border-radius: 0.5rem;
+                    cursor: pointer;
+                    transition: background-color 0.3s;
+                }
+
+                .Chat-btn:disabled {
+                    background-color: #ffa99d;
+                    cursor: not-allowed;
+                }
+
+                .Chat-btn:hover:not(:disabled) {
+                    background-color: #ff4c3b;
+                }
+
+                /* スマホ対応 */
+                @media (max-width: 576px) {
+                    .meal-form {
+                        padding: 1.5rem 1rem;
+                    }
+                }
+            `}</style>
+
+            <h2 className="form-title">オンライン食事リクエスト投稿</h2>
+
+            <form className="meal-form" onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label className="form-label">日付</label>
-                    <input type="date" className="form-control" name="date" onChange={handleChange} required />
+                    <input
+                        type="date"
+                        className="form-control"
+                        name="date"
+                        value={form.date}
+                        onChange={handleChange}
+                        required
+                    />
                 </div>
 
                 <div className="mb-3">
                     <label className="form-label">開始時間</label>
-                    <input type="time" className="form-control" name="time" onChange={handleChange} required />
+                    <input
+                        type="time"
+                        className="form-control"
+                        name="time"
+                        value={form.time}
+                        onChange={handleChange}
+                        required
+                    />
                 </div>
 
                 <div className="mb-3">
@@ -111,12 +184,18 @@ const MealRequestForm = () => {
                         onChange={handleChange}
                         required
                     />
-                    <small className="form-text text-muted">※ 例：30分、60分、90分など</small>
+                    <small className="form-text">※ 例：30分、60分、90分など</small>
                 </div>
 
                 <div className="mb-3">
                     <label className="form-label">ジャンル（例：和食、洋食など）</label>
-                    <select className="form-control" name="genre" onChange={handleChange} required>
+                    <select
+                        className="form-control"
+                        name="genre"
+                        value={form.genre}
+                        onChange={handleChange}
+                        required
+                    >
                         <option value="">選択してください</option>
                         <option value="和食">和食</option>
                         <option value="洋食">洋食</option>
@@ -130,7 +209,13 @@ const MealRequestForm = () => {
 
                 <div className="mb-3">
                     <label className="form-label">食べるもの　任意</label>
-                    <input type="text" className="form-control" name="menu" onChange={handleChange} />
+                    <input
+                        type="text"
+                        className="form-control"
+                        name="menu"
+                        value={form.menu}
+                        onChange={handleChange}
+                    />
                 </div>
 
                 <div className="mb-3">
@@ -145,10 +230,12 @@ const MealRequestForm = () => {
                         onChange={handleChange}
                         placeholder="例）3"
                     />
-                    <small className="form-text text-muted">※ 空欄なら制限なし</small>
+                    <small className="form-text">※ 空欄なら制限なし</small>
                 </div>
 
-                <button type="submit" className="btn Chat-btn w-100">リクエストを投稿</button>
+                <button type="submit" className="Chat-btn w-100" disabled={loading}>
+                    {loading ? '投稿中...' : 'リクエストを投稿'}
+                </button>
             </form>
         </div>
     );

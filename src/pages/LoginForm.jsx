@@ -4,13 +4,14 @@ import { auth, db } from '../firebase/firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import '../colors.js';
-import '../styles/LoginForm.css'; // スタイルシートのインポート
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const [hover, setHover] = useState(false);
+
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -56,35 +57,72 @@ function Login() {
     };
 
     return (
-        // 全体
-        <div className="container d-flex flex-column justify-content-center align-items-center bg-light"
+        <div
+            className="login-container"
             style={{
                 minHeight: '100vh',
-            }}>
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#f8f9fa',
+            }}
+        >
+            <style>{`
+                h1 {
+                    font-size: 10vw;
+                    color: #ff6f61;
+                    font-family: 'M PLUS Rounded 1c', sans-serif;
+                    user-select: none;
+                    text-align: center;
+                    margin-bottom: 1rem;
+                }
+                h2 {
+                    color: #ff6f61;
+                    font-size: 6vw;
+                    font-weight: bold;
+                    user-select: none;
+                    text-align: center;
+                    margin-bottom: 1.5rem;
+                }
+                .login-card {
+                    max-width: 400px;
+                    width: 90%;
+                    padding: 1.5rem;
+                    margin: 0 auto;
+                    border-radius: 1rem;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                }
+                .btn-lg {
+                    font-size: 1rem;
+                    padding: 0.5rem 1rem;
+                }
+                .login-link {
+                    color: #ff9e5e;
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+                @media (min-width: 576px) {
+                    h1 {
+                        font-size: 90px;
+                    }
+                    h2 {
+                        font-size: 30px;
+                    }
+                    .login-card {
+                        width: 100%;
+                    }
+                }
+            `}</style>
+
             {/* アプリ名 */}
             <header className="mb-4 w-100 text-center">
-
-                {/* <img src="/favicon.ico" style={{
-                    idth: '35px',
-                    height: '35px',
-                    objectFit: 'cover',
-                }} alt="" /> */}
-                <h1
-                    style={{
-                        fontSize: '90px',
-                        color: '#ff6f61',
-                        fontFamily: "'M PLUS Rounded 1c', sans-serif",
-                        userSelect: 'none',
-                    }}
-                >meeple</h1>
+                <h1>meeple</h1>
             </header>
+
             {/* ログインカード */}
-            <div className="card p-4 shadow rounded-4 w-100" style={{ maxWidth: '400px' }}>
-                <h2 className="text-center mb-4 fw-bold"
-                    style={{
-                        color: '#ff6f61', fontSize: '35px', userSelect: 'none',
-                    }}>
-                    ログイン</h2>
+            <div className="login-card">
+                <h2>ログイン</h2>
 
                 {error && <div className="alert alert-danger">{error}</div>}
 
@@ -113,11 +151,21 @@ function Login() {
                         />
                     </div>
 
-                    <div className="d-grid">
-                        <button type="submit" className="btn Login-btn2 btn-success btn-lg rounded-pill shadow-sm">
-                            ログイン
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        className="btn Login-btn2 btn-lg w-100 rounded-pill shadow-sm"
+                        style={{
+                            color: hover ? '#fff' : '#ff6f61',
+                            backgroundColor: hover ? '#ff6f61' : '#fff',
+                            transition: 'all 0.3s ease',
+                            border: `1px solid ${hover ? '#ff6f61' : '#ff6f61'}`,
+
+                        }}
+                        onMouseEnter={() => setHover(true)}
+                        onMouseLeave={() => setHover(false)}
+                    >
+                        ログイン
+                    </button>
                 </form>
 
                 <div className="d-grid mt-3">
@@ -134,50 +182,40 @@ function Login() {
                         <span>Googleでログイン</span>
                     </button>
                 </div>
-                <div className="d-grid mt-3">
-                    <small className="text-center">
+
+                <div className="d-grid mt-3 text-center login-footer">
+                    <small>
                         アカウントをお持ちでない方は{' '}
                         <span
                             role="button"
                             tabIndex={0}
                             onClick={() => navigate('/register')}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    setIsLoginPage(true);
-                                }
+                                if (e.key === 'Enter' || e.key === ' ') e.preventDefault();
                             }}
-                            style={{
-                                color: '#ff9e5e',
-                                textDecoration: 'underline',
-                                cursor: 'pointer',
-                            }}
+                            className="login-link"
                         >
                             新規登録
                         </span>
                     </small>
-                    <small className="text-center">
+                    <br />
+                    <small>
                         アプリの使い方{' '}
                         <a
                             href="https://v0-remix-of-meeple-app-documentati.vercel.app/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{
-                                color: '#ff9e5e',
-                                textDecoration: 'underline',
-                                cursor: 'pointer',
-                            }}
+                            className="login-link"
                         >
                             こちら
                         </a>
-
-
                     </small>
                 </div>
-
-
             </div>
         </div>
+
+
+
     );
 }
 

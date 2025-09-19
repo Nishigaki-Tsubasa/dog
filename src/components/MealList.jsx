@@ -69,15 +69,16 @@ const MealList = () => {
         if (request.pendingRequests?.includes(userId)) return '承認待ち';
         return '申請可能';
     };
-    // 参加申し込み画面
+
     return (
-        <div className="container py-5" style={{ maxWidth: 900 }}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold display-6 m-0" style={{ fontSize: '1.8rem',letterSpacing: '0.05em'}}>
+        <div className="container py-4" style={{ maxWidth: 900 }}>
+            <div className="d-flex justify-content-between align-items-center mb-3 mb-md-4">
+                <h2 className="fw-bold m-0" style={{ fontSize: '1.6rem', letterSpacing: '0.05em' }}>
                     食事の一覧
                 </h2>
                 <button
                     className="btn MealList-btn d-flex align-items-center"
+                    style={{ fontSize: '0.9rem', padding: '0.4rem 0.8rem' }}
                     onClick={() => navigate('/home/new-request')}
                 >
                     <FaPlus className="me-2" /> 新規投稿
@@ -85,9 +86,11 @@ const MealList = () => {
             </div>
 
             {requests.length === 0 ? (
-                <p className="text-muted text-center mt-5">リクエストがありません</p>
+                <p className="text-muted text-center mt-5" style={{ fontSize: '0.9rem' }}>
+                    リクエストがありません
+                </p>
             ) : (
-                <div className="row row-cols-1 row-cols-md-2 g-4">
+                <div className="row row-cols-1 row-cols-md-2 g-3 g-md-4">
                     {requests
                         .filter((req) => req.uid !== user.uid)
                         .filter((req) => req.startTime.toDate() > new Date())
@@ -99,42 +102,41 @@ const MealList = () => {
                             return (
                                 <div key={req.id} className="col">
                                     <div className="card h-100 border-0 shadow rounded-4">
-                                        <div className="card-body d-flex flex-column p-4">
+                                        <div className="card-body d-flex flex-column p-3 p-md-4">
                                             <h5
-                                                className="MealList-Name card-title fw-bold mb-3"
+                                                className="MealList-Name card-title fw-bold mb-2 mb-md-3"
                                                 role="button"
                                                 onClick={() => navigate(`/home/profile/${req.uid}`)}
-                                                style={{ cursor: 'pointer', userSelect: 'none', }}
+                                                style={{ cursor: 'pointer', userSelect: 'none', fontSize: '1rem' }}
                                                 onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
                                                 onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
                                             >
                                                 {req.username || '匿名'}
                                             </h5>
 
-                                            <p className="card-text text-muted mb-1 small">
-                                                📅 <strong>日時:</strong>{' '}
-                                                {format(req.startTime.toDate(), 'M月d日(EEE) HH:mm', { locale: ja })} 〜（
-                                                {Math.round(req.durationHours * 60)}分）
+                                            <p className="card-text text-muted mb-1 small" style={{ fontSize: '0.8rem' }}>
+                                                📅 {format(req.startTime.toDate(), 'M月d日(EEE) HH:mm', { locale: ja })} 〜{' '}
+                                                {Math.round(req.durationHours * 60)}分
                                             </p>
 
-                                            <p className="card-text text-muted mb-3 small">
-                                                🍽️ <strong>ジャンル・メニュー:</strong> {req.genre} / {req.menu || '未設定'}
+                                            <p className="card-text text-muted mb-2 small" style={{ fontSize: '0.8rem' }}>
+                                                🍽️ {req.genre} / {req.menu || '未設定'}
                                             </p>
 
                                             <div className="mt-auto text-end">
                                                 {isApplyEnabled ? (
                                                     <button
-                                                        className="btn MealList-btn btn-primary btn-sm px-4 rounded-pill"
+                                                        className="btn MealList-btn btn-primary btn-sm px-3 px-md-4 rounded-pill"
+                                                        style={{ fontSize: '0.8rem' }}
                                                         onClick={() => handleApply(req)}
                                                     >
                                                         参加申請
                                                     </button>
                                                 ) : (
                                                     <button
-                                                        className={`btn my-btn btn-sm px-4 rounded-pill ${status === '承認済み'
-                                                            ? 'btn-success'
-                                                            : 'btn-secondary'
+                                                        className={`btn my-btn btn-sm px-3 px-md-4 rounded-pill ${status === '承認済み' ? 'btn-success' : 'btn-secondary'
                                                             }`}
+                                                        style={{ fontSize: '0.8rem' }}
                                                         disabled
                                                     >
                                                         {status}
@@ -149,7 +151,6 @@ const MealList = () => {
                 </div>
             )}
 
-            {/* スタイル調整用の追加CSS */}
             <style>{`
                 .card-title:hover {
                     color: #0d6efd;
@@ -157,15 +158,13 @@ const MealList = () => {
 
                 @media (max-width: 575.98px) {
                     .card-title {
-                        font-size: 1rem;
+                        font-size: 0.95rem;
                     }
-
                     .card-text {
-                        font-size: 0.8rem;
+                        font-size: 0.75rem;
                     }
-
                     .btn {
-                        font-size: 0.8rem;
+                        font-size: 0.75rem;
                         padding: 0.3rem 0.6rem;
                     }
                 }

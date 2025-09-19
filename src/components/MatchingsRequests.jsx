@@ -50,24 +50,22 @@ const MyRequestsWithDetails = () => {
                 const pendingUIDs = data.pendingRequests || [];
                 const participantsUIDs = data.participants || [];
 
-                // 申請ユーザー情報
                 const pendingUsers = await Promise.all(
                     pendingUIDs.map(async (uid) => {
                         const userDoc = await getDoc(doc(db, 'users', uid));
                         return {
                             uid,
-                            username: userDoc.exists() ? userDoc.data().username || '匿名' : '不明なユーザー',
+                            username: userDoc.exists() ? userDoc.data().username || '匿名' : '不明',
                         };
                     })
                 );
 
-                // 参加者ユーザー情報
                 const participantUsers = await Promise.all(
                     participantsUIDs.map(async (uid) => {
                         const userDoc = await getDoc(doc(db, 'users', uid));
                         return {
                             uid,
-                            username: userDoc.exists() ? userDoc.data().username || '匿名' : '不明なユーザー',
+                            username: userDoc.exists() ? userDoc.data().username || '匿名' : '不明',
                         };
                     })
                 );
@@ -80,7 +78,6 @@ const MyRequestsWithDetails = () => {
                 });
             }
 
-            // 日付順にソート
             const sortedRequests = requestsData.sort(
                 (a, b) => a.startTime.toDate() - b.startTime.toDate()
             );
@@ -118,7 +115,7 @@ const MyRequestsWithDetails = () => {
     };
 
     const handleDeleteRequest = async (requestId) => {
-        if (!window.confirm('このリクエストを削除しますか？')) return;
+        if (!window.confirm('削除しますか？')) return;
 
         try {
             await deleteDoc(doc(db, 'mealRequests', requestId));
@@ -132,12 +129,16 @@ const MyRequestsWithDetails = () => {
 
     return (
         <div className="container mt-5" style={{ maxWidth: 700 }}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1 className="fw-bold m-0" style={{ fontSize: '1.8rem', letterSpacing: '0.05em' }}>
-                    あなたの食事リクエスト一覧
+            <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+                <h1
+                    className="fw-bold m-0"
+                    style={{ fontSize: '1.5rem', letterSpacing: '0.05em' }}
+                >
+                    投稿したリクエスト
                 </h1>
                 <button
-                    className="btn Requests-btn d-flex align-items-center"
+                    className="btn MealList-btn d-flex align-items-center"
+                    style={{ fontSize: '0.9rem', padding: '0.4rem 0.8rem' }}
                     onClick={() => navigate('/home/new-request')}
                 >
                     <FaPlus className="me-2" /> 新規投稿
@@ -154,21 +155,25 @@ const MyRequestsWithDetails = () => {
                     return (
                         <div
                             key={req.id}
-                            className="shadow-sm mb-4 p-4 rounded bg-white"
+                            className="shadow-sm mb-4 p-3 p-md-4 rounded bg-white"
                             style={{ transition: 'transform 0.3s' }}
                             onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.02)')}
                             onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                         >
-                            <div className="d-flex justify-content-between align-items-center">
+                            <div className="d-flex justify-content-between align-items-start flex-wrap">
                                 <div>
-                                    <h5 className="fw-bold">{req.genre} / {req.menu}</h5>
-                                    <p className="mb-1 text-muted">
+                                    <h5 className="fw-bold mb-1" style={{ fontSize: '1rem' }}>
+                                        {req.genre} / {req.menu}
+                                    </h5>
+                                    <p className="mb-1 text-muted" style={{ fontSize: '0.85rem' }}>
                                         日時: {start.toLocaleString('ja-JP')}
                                     </p>
-                                    <p className="mb-0 text-muted">時間: {duration}分</p>
+                                    <p className="mb-0 text-muted" style={{ fontSize: '0.85rem' }}>
+                                        時間: {duration}分
+                                    </p>
                                 </div>
                                 <button
-                                    className="btn btn-sm btn-outline-secondary"
+                                    className="btn btn-sm btn-outline-secondary mt-2 mt-md-0"
                                     onClick={() => toggleExpand(req.id)}
                                 >
                                     {expandedId === req.id ? <FaChevronUp /> : <FaChevronDown />}
@@ -177,15 +182,14 @@ const MyRequestsWithDetails = () => {
 
                             {expandedId === req.id && (
                                 <div className="mt-3">
-                                    {/* 申請ユーザー一覧 */}
-                                    <h6>申請中のユーザー</h6>
+                                    <h6 style={{ fontSize: '0.9rem' }}>申請中</h6>
                                     {req.pendingUsers.length === 0 ? (
-                                        <p className="text-muted">申請はありません。</p>
+                                        <p className="text-muted">なし</p>
                                     ) : (
                                         req.pendingUsers.map((u) => (
                                             <div
                                                 key={u.uid}
-                                                className="d-flex justify-content-between align-items-center mb-2"
+                                                className="d-flex justify-content-between align-items-center mb-1"
                                             >
                                                 <div className="d-flex align-items-center">
                                                     <FaUserCircle className="me-2" />
@@ -193,7 +197,7 @@ const MyRequestsWithDetails = () => {
                                                 </div>
                                                 <div>
                                                     <button
-                                                        className="btn btn-sm btn-success me-2"
+                                                        className="btn btn-sm btn-success me-1"
                                                         onClick={() => handleApproval(req.id, u.uid, true)}
                                                     >
                                                         <FaCheck />
@@ -209,15 +213,14 @@ const MyRequestsWithDetails = () => {
                                         ))
                                     )}
 
-                                    {/* 参加者一覧 */}
-                                    <h6 className="mt-3">参加者</h6>
+                                    <h6 className="mt-2" style={{ fontSize: '0.9rem' }}>参加者</h6>
                                     {req.participantUsers.length === 0 ? (
-                                        <p className="text-muted">まだ参加者はいません。</p>
+                                        <p className="text-muted">なし</p>
                                     ) : (
                                         req.participantUsers.map((u) => (
                                             <div
                                                 key={u.uid}
-                                                className="d-flex justify-content-between align-items-center mb-2"
+                                                className="d-flex justify-content-between align-items-center mb-1"
                                             >
                                                 <div className="d-flex align-items-center">
                                                     <FaUserCircle className="me-2" />
@@ -233,19 +236,13 @@ const MyRequestsWithDetails = () => {
                                         ))
                                     )}
 
-                                    {/* チャット・削除 */}
-                                    <div className="mt-3 d-flex gap-2">
-                                        {/* <button
-                                            className="btn btn-outline-primary flex-grow-1"
-                                            onClick={() => navigate(`/home/chat/${req.id}`)}
-                                        >
-                                            <FaComments className="me-2" /> チャット
-                                        </button> */}
+                                    <div className="mt-2 d-flex gap-2 flex-wrap">
+                                        {/* チャットボタンは必要なら有効化 */}
                                         <button
                                             className="btn btn-outline-danger flex-grow-1"
                                             onClick={() => handleDeleteRequest(req.id)}
                                         >
-                                            <FaTrash className="me-2" /> リクエスト削除
+                                            <FaTrash className="me-1" /> 削除
                                         </button>
                                     </div>
                                 </div>
@@ -254,14 +251,6 @@ const MyRequestsWithDetails = () => {
                     );
                 })
             )}
-
-            <style>{`
-              @media (max-width: 767.98px) {
-                .btn-text {
-                  display: none;
-                }
-              }
-            `}</style>
         </div>
     );
 };

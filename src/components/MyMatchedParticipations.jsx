@@ -102,13 +102,10 @@ const MyMatchedParticipationsOnly = () => {
                     return (
                         <div
                             key={req.id}
-                            className="shadow-sm mb-4 p-4 rounded bg-white"
-                            style={{ transition: 'transform 0.3s' }}
-                            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
-                            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                            className="shadow-sm mb-4 p-4 rounded bg-white card-hover"
                         >
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h5 className="fw-semibold mb-0">
+                            <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                                <h5 className="fw-semibold mb-2 mb-md-0">
                                     {req.genre} {req.menu && `/ ${req.menu}`}
                                 </h5>
                                 <button
@@ -154,28 +151,23 @@ const MyMatchedParticipationsOnly = () => {
 
                                 {/* 投稿者を表示（自分が参加者の時） */}
                                 {!req.isHost && user.uid !== req.uid && (
-                                    <div className="d-flex align-items-center justify-content-between mb-3 p-2 bg-opacity-10 rounded shadow-sm"
-                                        style={{ backgroundColor: '#fffcf1' }}>
-                                        <div className="d-flex align-items-center gap-2 fw-semibold "
-                                            style={{ color: '#555' }}
-                                            >
+                                    <div className="participant-card host-card mb-2">
+                                        <div className="participant-info d-flex align-items-center gap-2 fw-semibold">
                                             <FaUserCircle size={26} color="#ff6f61" />
-                                            <span>{usernamesMap[req.uid] || '匿名ホスト'}</span>
+                                            <span className="participant-name">{usernamesMap[req.uid] || '匿名ホスト'}</span>
                                         </div>
-                                        <div className="d-flex gap-2 flex-wrap">
+                                        <div className="participant-actions d-flex gap-2 flex-wrap">
                                             <button
                                                 className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
                                                 onClick={() => navigate(`/home/profile/${req.uid}`)}
-                                                aria-label={`投稿者プロフィール確認 ${usernamesMap[req.uid] || '匿名ホスト'}`}
                                             >
-                                                <FaUserCircle /> プロフィール
+                                                <FaUserCircle /> <span className="btn-text">プロフィール</span>
                                             </button>
                                             <button
                                                 className="btn MyMatched-btn2 btn-sm d-flex align-items-center gap-1"
                                                 onClick={() => navigate(`/home/chatStart/${req.uid}`)}
-                                                aria-label={`投稿者へチャット開始 ${usernamesMap[req.uid] || '匿名ホスト'}`}
                                             >
-                                                <FaComments /> チャット
+                                                <FaComments /> <span className="btn-text">チャット</span>
                                             </button>
                                         </div>
                                     </div>
@@ -184,32 +176,24 @@ const MyMatchedParticipationsOnly = () => {
                                 {/* 参加者一覧（自分は除外） */}
                                 {req.participants && req.participants.length > 0 ? (
                                     req.participants.filter(uid => uid !== user.uid).map(uid => (
-                                        <div
-                                            key={uid}
-                                            className="d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded shadow-sm"
-                                        >
-                                            <div className="d-flex align-items-center gap-2 fw-medium text-secondary">
+                                        <div key={uid} className="participant-card mb-2">
+                                            <div className="participant-info d-flex align-items-center gap-2 fw-medium text-secondary">
                                                 <FaUserCircle size={24} color="#2980b9" />
-                                                <span>{usernamesMap[uid] || uid}</span>
+                                                <span className="participant-name">{usernamesMap[uid] || uid}</span>
                                             </div>
-                                            <div className="d-flex gap-2 flex-wrap">
+                                            <div className="participant-actions d-flex gap-2 flex-wrap">
                                                 <button
                                                     className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
                                                     onClick={() => navigate(`/home/profile/${uid}`)}
-                                                    aria-label={`プロフィール確認 ${usernamesMap[uid] || uid}`}
                                                 >
-                                                    <FaUserCircle />
-                                                    <span className="btn-text">プロフィール</span>
+                                                    <FaUserCircle /> <span className="btn-text">プロフィール</span>
                                                 </button>
                                                 <button
                                                     className="btn MyMatched-btn2 btn-sm d-flex align-items-center gap-1"
                                                     onClick={() => navigate(`/home/chatStart/${uid}`)}
-                                                    aria-label={`チャット開始 ${usernamesMap[uid] || uid}`}
                                                 >
-                                                    <FaComments />
-                                                    <span className="btn-text">チャット</span>
+                                                    <FaComments /> <span className="btn-text">チャット</span>
                                                 </button>
-
                                             </div>
                                         </div>
                                     ))
@@ -223,13 +207,68 @@ const MyMatchedParticipationsOnly = () => {
             )}
 
             <style>{`
-  @media (max-width: 767.98px) {
-    .btn-text {
-      display: none;
-    }
-  }
-`}</style>
+        /* Card hover effect */
+        .card-hover {
+          transition: transform 0.3s;
+        }
+        .card-hover:hover {
+          transform: scale(1.02);
+        }
 
+        /* Participant card styling */
+        .participant-card {
+          padding: 0.5rem;
+          border-radius: 0.5rem;
+          background-color: #f8f9fa;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+
+        .host-card {
+          background-color: #fffcf1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+          .participant-card {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .participant-actions {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+            width: 100%;
+            flex-wrap: nowrap; /* 横1行 */
+          }
+          .participant-actions .btn {
+            flex: 1 1 auto;
+            text-align: center;
+          }
+          
+          .participant-info {
+            margin-bottom: 0.5rem;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .participant-card {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .participant-actions {
+            flex-direction: row;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+          }
+          .btn-text {
+            display: inline;
+          }
+        }
+      `}</style>
         </div>
     );
 };

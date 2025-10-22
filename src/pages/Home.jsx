@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, NavLink, useNavigate } from 'react-router-dom';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 import EditProfile from '../components/EditProfile';
 import MealRegistrationForm from '../components/MealRegistrationForm';
@@ -17,7 +17,6 @@ import ChatRoom from '../components/chatComponets/ChatRoom';
 import ChatStart from '../components/chatComponets/ChatStart';
 import JitsiMeet from '../components/JitsiMeet';
 import Notifications from '../components/Notifications';
-import RandomJapaneseMenu from '../components/RandomJapaneseMenu';
 
 import colors from '../colors';
 import '../styles/Home.css';
@@ -28,27 +27,39 @@ function Home() {
 
     // PCとスマホ用の状態を分ける
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-    const [sidebarOpenPC, setSidebarOpenPC] = useState(true); // PCはデフォルト開
-    const [sidebarOpenMobile, setSidebarOpenMobile] = useState(false); // モバイルはデフォルト閉じ
+    const [sidebarOpenPC, setSidebarOpenPC] = useState(true);
+    const [sidebarOpenMobile, setSidebarOpenMobile] = useState(false);
     const [hovered, setHovered] = useState(false);
 
     const sidebarWidthOpen = 250;
     const sidebarWidthClosed = 70;
 
+    // リサイズ判定
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // ユーザー情報取得
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const uid = user.uid;
-                const userDocRef = doc(db, 'users', uid);
+
                 try {
+                    const userDocRef = doc(db, 'users', uid);
                     const userDocSnap = await getDoc(userDocRef);
-                    setUsername(userDocSnap.exists() ? userDocSnap.data().username || '名無し' : '名無し');
+
+                    if (userDocSnap.exists()) {
+                        const data = userDocSnap.data();
+                        console.log('Firestore user data:', data);
+                        // owner マップの username を取得
+                        const ownerUsername = data.owner?.username || '名無し';
+                        setUsername(ownerUsername);
+                    } else {
+                        setUsername('名無し');
+                    }
                 } catch (error) {
                     console.error('ユーザー情報の取得に失敗しました:', error);
                     setUsername('名無し');
@@ -60,6 +71,8 @@ function Home() {
         return () => unsubscribe();
     }, []);
 
+
+    // ログアウト処理
     const handleLogout = async () => {
         try {
             await signOut(auth);
@@ -71,11 +84,10 @@ function Home() {
 
     const menuItems = [
         { to: '/home/', icon: 'bi-house-door', label: 'ホーム' },
-        { to: '/home/mealList', icon: 'bi-pencil-square', label: '参加申し込み' },
+        { to: '/home/mealList', icon: 'bi-pencil-square', label: '掲示板' },
         { to: '/home/matchingsRequests', icon: 'bi-envelope', label: '食事リクエスト' },
         { to: '/home/matching', icon: 'bi-people', label: 'マッチング済み' },
         { to: '/home/chat', icon: 'bi-chat-dots', label: 'チャット' },
-        { to: '/home/hogehoge', icon: 'bi-calendar', label: 'メニュー' },
     ];
 
     // モバイルクリック時に閉じる
@@ -85,38 +97,24 @@ function Home() {
 
     return (
         <div className="d-flex flex-column flex-md-row" style={{ minHeight: '100vh', backgroundColor: colors.mainBg, color: colors.text }}>
-            {/* モバイル時のみヘッダー */}
+            {/* モバイル時ヘッダー */}
             {isMobile && (
                 <header
                     className="d-flex align-items-center justify-content-between px-3 py-3 border-bottom"
                     style={{ backgroundColor: colors.subBg, minHeight: 70 }}
                 >
-                    {/* メニュー開閉ボタン */}
                     <button
                         onClick={() => setSidebarOpenMobile(true)}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            padding: 0,
-                            margin: 0,
-                            cursor: 'pointer',
-                            color: 'inherit',
-                        }}
+                        style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer', color: 'inherit' }}
                     >
                         <i className="bi bi-list fs-4"></i>
                     </button>
 
-                    {/* 中央にアイコンとアプリ名 */}
                     <div className="d-flex align-items-center">
-                        <img
-                            src="/favicon.ico"
-                            alt="App Icon"
-                            style={{ width: 40, height: 40, objectFit: 'cover', marginRight: 8 }}
-                        />
+                        <img src="/favicon.ico" alt="App Icon" style={{ width: 40, height: 40, objectFit: 'cover', marginRight: 8 }} />
                         <span style={{ fontWeight: '600', fontSize: '1.2rem', color: '#ff6f61' }}>meeple</span>
                     </div>
 
-                    {/* 右側のスペース（ログアウトボタン削除のため空に） */}
                     <div style={{ width: 40 }}></div>
                 </header>
             )}
@@ -140,14 +138,7 @@ function Home() {
                     <div className="d-flex justify-content-end mb-3">
                         <button
                             onClick={() => setSidebarOpenMobile(false)}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                padding: 0,
-                                margin: 0,
-                                cursor: 'pointer',
-                                color: 'inherit',
-                            }}
+                            style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer', color: 'inherit' }}
                         >
                             <i className="bi bi-x-lg fs-4"></i>
                         </button>
@@ -184,7 +175,7 @@ function Home() {
                             <div>
                                 <div className="small text-muted" style={{ userSelect: 'none' }}>ようこそ、</div>
                                 <div className="fw-bold text-dark text-truncate" style={{ maxWidth: 150, userSelect: 'none' }}>
-                                    {username ?? '未設定'}
+                                    {username ? username : '読み込み中...'}
                                 </div>
                             </div>
                         )}
@@ -198,7 +189,7 @@ function Home() {
                             <NavLink
                                 to={to}
                                 end
-                                onClick={handleMobileClick} // モバイルで押されたら閉じる
+                                onClick={handleMobileClick}
                                 className={({ isActive }) => `nav-link sidebarLink d-flex align-items-center ${isActive ? 'active' : ''}`}
                             >
                                 <i className={`bi ${icon} fs-5`}></i>
@@ -230,7 +221,6 @@ function Home() {
                     <Route path="/chatStart/:userId" element={<ChatStart />} />
                     <Route path="/jitsi/:roomId" element={<JitsiMeet />} />
                     <Route path="/notifications" element={<Notifications />} />
-                    <Route path="/hogehoge" element={<RandomJapaneseMenu />} />
                     <Route path="/EditProfile" element={<EditProfile />} />
                 </Routes>
             </main>

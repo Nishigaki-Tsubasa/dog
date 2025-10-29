@@ -117,7 +117,7 @@ function Login() {
 
             {/* アプリ名 */}
             <header className="mb-4 w-100 text-center">
-                <h1>meeple</h1>
+                <h1>meepets</h1>
             </header>
 
             {/* ログインカード */}

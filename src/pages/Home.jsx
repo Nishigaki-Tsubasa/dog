@@ -17,6 +17,8 @@ import ChatRoom from '../components/chatComponets/ChatRoom';
 import ChatStart from '../components/chatComponets/ChatStart';
 import JitsiMeet from '../components/JitsiMeet';
 import Notifications from '../components/Notifications';
+import WalkRequestForm from '../components/WalkRequestForm';
+import WalkList from '../components/WalkList';
 
 import colors from '../colors';
 import '../styles/Home.css';
@@ -88,6 +90,7 @@ function Home() {
         { to: '/home/matchingsRequests', icon: 'bi-envelope', label: '食事リクエスト' },
         { to: '/home/matching', icon: 'bi-people', label: 'マッチング済み' },
         { to: '/home/chat', icon: 'bi-chat-dots', label: 'チャット' },
+        { to: '/home/WalkList', icon: 'bi-bell', label: '散歩掲示板' },
     ];
 
     // モバイルクリック時に閉じる
@@ -222,6 +225,8 @@ function Home() {
                     <Route path="/jitsi/:roomId" element={<JitsiMeet />} />
                     <Route path="/notifications" element={<Notifications />} />
                     <Route path="/EditProfile" element={<EditProfile />} />
+                    <Route path="/walkRequest" element={<WalkRequestForm />} />
+                    <Route path="/WalkList" element={<WalkList />} />
                 </Routes>
             </main>
         </div>
